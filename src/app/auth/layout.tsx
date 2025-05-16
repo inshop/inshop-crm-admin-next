@@ -1,8 +1,8 @@
 'use client'
 
-import {styled} from '@mui/material/styles';
-import MuiCard from "@mui/material/Card";
-import Stack from "@mui/material/Stack";
+import {styled} from '@mui/material/styles'
+import MuiCard from "@mui/material/Card"
+import Stack from "@mui/material/Stack"
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -21,7 +21,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
     boxShadow:
       'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
   }),
-}));
+}))
 
 const AuthContainer = styled(Stack)(({ theme }) => ({
   height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
@@ -44,12 +44,12 @@ const AuthContainer = styled(Stack)(({ theme }) => ({
         'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
     }),
   },
-}));
+}))
 
 export default function AuthLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <AuthContainer direction="column" justifyContent="space-between">
@@ -57,5 +57,5 @@ export default function AuthLayout({
         {children}
       </Card>
     </AuthContainer>
-  );
+  )
 }
