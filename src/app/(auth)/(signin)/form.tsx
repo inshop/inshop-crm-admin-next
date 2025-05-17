@@ -118,8 +118,7 @@ export default function Form() {
           Sign in
         </Button>
         <Link
-          href="/auth/reset"
-          // component="button"
+          href="/reset-password"
           component={NextLink}
           type="button"
           variant="body2"

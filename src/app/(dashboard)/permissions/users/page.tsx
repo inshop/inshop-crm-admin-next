@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 
 export default function SignIn() {
   return (
-    <>Groups</>
+    <>Users</>
   )
 }

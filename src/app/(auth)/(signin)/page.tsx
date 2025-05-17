@@ -1,10 +1,10 @@
 import * as React from 'react'
-import type {Metadata} from "next"
-import Form from "@/app/auth/reset/form"
+import Form from "@/app/(auth)/(signin)/form";
+import type {Metadata} from "next";
 
 export const metadata: Metadata = {
-  title: "Reset password",
-  description: "Reset password",
+  title: "Sign in",
+  description: "Sign in",
 }
 
 export default function SignIn() {
