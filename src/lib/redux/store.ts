@@ -1,13 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit'
-import clientsSlice from "@/lib/redux/features/clientsSlice";
+import {api} from "@/lib/redux/api";
+// import {setupListeners} from "@reduxjs/toolkit/query";
 
 export const makeStore = () => {
   return configureStore({
-    reducer: {
-      clients: clientsSlice,
-    }
+    reducer: api.reducer,
+    // middleware: (getDefaultMiddleware) =>
+    //   getDefaultMiddleware().concat(api.middleware)
   })
 }
+
+// setupListeners(makeStore().dispatch)
 
 export type AppStore = ReturnType<typeof makeStore>
 export type RootState = ReturnType<AppStore['getState']>

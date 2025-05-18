@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "api-generate": "npx @rtk-query/codegen-openapi openapi-config.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -25,11 +26,13 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@rtk-query/codegen-openapi": "^2.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
