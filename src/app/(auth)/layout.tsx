@@ -46,11 +46,7 @@ const AuthContainer = styled(Stack)(({ theme }) => ({
   },
 }))
 
-export default function AuthLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <AuthContainer direction="column" justifyContent="space-between">
       <Card variant="outlined">

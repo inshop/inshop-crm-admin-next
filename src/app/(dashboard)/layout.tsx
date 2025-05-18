@@ -30,11 +30,7 @@ const menuItems = [{
   path: '/permissions/groups',
 }]
 
-export default function DashboardLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
