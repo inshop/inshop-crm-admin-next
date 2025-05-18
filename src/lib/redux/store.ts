@@ -4,9 +4,14 @@ import {api} from "@/lib/redux/api";
 
 export const makeStore = () => {
   return configureStore({
-    reducer: api.reducer,
-    // middleware: (getDefaultMiddleware) =>
-    //   getDefaultMiddleware().concat(api.middleware)
+    reducer: {
+      [api.reducerPath]: api.reducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        immutableCheck: false,
+        serializableCheck: false,
+      }).concat(api.middleware)
   })
 }
 
