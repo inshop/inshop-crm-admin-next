@@ -1,10 +1,10 @@
 import * as React from 'react'
-import type {Metadata} from 'next'
-import PageList from '@/components/PageList'
-import {GridColDef} from '@mui/x-data-grid'
+import type {Metadata} from "next";
+import {GridColDef} from "@mui/x-data-grid";
+import PageList from "@/components/PageList";
 
-const title = 'Clients'
-const entity = 'client'
+const title = 'Roles'
+const entity = 'role'
 
 export const metadata: Metadata = {
   title,

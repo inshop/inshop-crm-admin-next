@@ -5,14 +5,21 @@ import {useClientsControllerFindAllQuery} from "@/lib/redux/features/clients";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import CustomDataGrid from "@/components/CustomDataGrid";
+import {GridColDef} from "@mui/x-data-grid";
 
-export default function PageList() {
+interface PageListType {
+  title: string,
+  entity: string,
+  columns: GridColDef[],
+}
+
+export default function PageList({ title, entity, columns }: PageListType) {
   return (
     <>
-      <Typography variant="h2">Clients</Typography>
+      <Typography variant="h2">{title}</Typography>
 
       <Box sx={{ width: '100%', mt: 4 }}>
-        <CustomDataGrid query={useClientsControllerFindAllQuery}></CustomDataGrid>
+        <CustomDataGrid query={useClientsControllerFindAllQuery} columns={columns}></CustomDataGrid>
       </Box>
     </>
   )

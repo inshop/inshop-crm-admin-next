@@ -1,55 +1,17 @@
 'use client'
 
 import * as React from 'react'
-import {useClientsControllerFindAllQuery} from "@/lib/redux/features/clients";
-import {DataGrid, GridColDef} from '@mui/x-data-grid';
-import {useMemo} from "react";
+import {DataGrid, GridColDef} from '@mui/x-data-grid'
+import {useMemo} from "react"
+import {UseQuery} from '@reduxjs/toolkit/src/query/react/buildHooks'
 
-const columns: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'ID',
-    flex: 0.1,
-    minWidth: 100,
-    sortable: false,
-    disableColumnMenu: true,
-  },
-  {
-    field: 'name',
-    headerName: 'Name',
-    flex: 0.4,
-    minWidth: 200,
-    editable: true,
-    sortable: false,
-    disableColumnMenu: true,
-  },
-  {
-    field: 'email',
-    headerName: 'email',
-    flex: 0.4,
-    minWidth: 200,
-    editable: true,
-    sortable: false,
-    disableColumnMenu: true,
-  },
-  {
-    field: 'isActive',
-    headerName: 'Active',
-    type: 'boolean',
-    flex: 0.1,
-    minWidth: 100,
-    editable: true,
-    sortable: false,
-    disableColumnMenu: true,
-  }
-];
-
-type CustomDataGridType = {
-  query: string
+interface CustomDataGridType {
+  query: UseQuery<unknown>,
+  columns: GridColDef[],
 }
 
-export default function CustomDataGrid({ query }: CustomDataGridType) {
-  const { data, error, isLoading } = useClientsControllerFindAllQuery({
+export default function CustomDataGrid({ query, columns }: CustomDataGridType) {
+  const { data, error, isLoading } = query({
     take: 10,
     skip: 0
   })

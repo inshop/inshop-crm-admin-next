@@ -28,6 +28,12 @@ const menuItems = [{
 }, {
   name: 'Groups',
   path: '/permissions/groups',
+}, {
+  name: 'Roles',
+  path: '/permissions/roles',
+}, {
+  name: 'Modules',
+  path: '/permissions/modules',
 }]
 
 export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
