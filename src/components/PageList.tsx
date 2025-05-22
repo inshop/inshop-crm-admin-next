@@ -1,11 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import {useClientsControllerFindAllQuery} from "@/lib/redux/features/clients";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import CustomDataGrid from "@/components/CustomDataGrid";
 import {GridColDef} from "@mui/x-data-grid";
+import {capitalize} from "@mui/material";
+import pluralize from "pluralize";
+import {useEffect} from "react";
 
 interface PageListType {
   title: string,
@@ -14,12 +16,21 @@ interface PageListType {
 }
 
 export default function PageList({ title, entity, columns }: PageListType) {
+  const [api, setApi] = React.useState(null)
+  const key = `use${capitalize(pluralize(entity))}ControllerFindAllQuery`;
+
+  useEffect(() => {
+    (async () => {
+      setApi(await import('@/lib/redux/features/' + pluralize(entity)))
+    })()
+  }, [entity])
+
   return (
     <>
       <Typography variant="h2">{title}</Typography>
 
       <Box sx={{ width: '100%', mt: 4 }}>
-        <CustomDataGrid query={useClientsControllerFindAllQuery} columns={columns}></CustomDataGrid>
+        {api && <CustomDataGrid query={api[key]} columns={columns}></CustomDataGrid>}
       </Box>
     </>
   )

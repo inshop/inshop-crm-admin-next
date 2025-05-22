@@ -21,6 +21,7 @@
     "@mui/x-data-grid": "^8.3.1",
     "@reduxjs/toolkit": "^2.8.2",
     "next": "15.3.2",
+    "pluralize": "^8.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0"
@@ -29,6 +30,7 @@
     "@eslint/eslintrc": "^3",
     "@rtk-query/codegen-openapi": "^2.0.0",
     "@types/node": "^20",
+    "@types/pluralize": "^0.0.33",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

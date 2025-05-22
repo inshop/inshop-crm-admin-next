@@ -1,8 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import {DataGrid, GridColDef} from '@mui/x-data-grid'
-import {useMemo} from "react"
+import {DataGrid, GridColDef, GridSortModel} from '@mui/x-data-grid'
+import {useMemo, useState} from "react"
+import {Alert} from "@mui/material";
 import {UseQuery} from '@reduxjs/toolkit/src/query/react/buildHooks'
 
 interface CustomDataGridType {
@@ -10,41 +11,53 @@ interface CustomDataGridType {
   columns: GridColDef[],
 }
 
+const pageSizeOptions = [5, 10, 25, 50, 100]
+
 export default function CustomDataGrid({ query, columns }: CustomDataGridType) {
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
+  const [sortModel, setSortModel] = useState<GridSortModel>([])
+
   const { data, error, isLoading } = query({
-    take: 10,
-    skip: 0
+    take: paginationModel.pageSize,
+    skip: paginationModel.page * paginationModel.pageSize,
   })
 
-  const rows = useMemo(() => {
-    if (data) {
-      return data[0].map((client: any) => ({
-        id: client.id,
-        name: client.name,
-        email: client.email,
-        isActive: client.isActive
-      }))
-    }
+  const rows = useMemo(() => data && data[0] || [], [data])
+  const rowCount = useMemo(() => data && data[1] || 0, [data])
 
-    return []
-  }, [data])
-
-  // console.log('data', data, error, isLoading)
+  // console.log('error', error)
 
   return (
-    <DataGrid
-      rows={rows}
-      columns={columns}
-      initialState={{
-        pagination: {
-          paginationModel: {
-            pageSize: 5,
+    <>
+      {error && <Alert severity="error" sx={{mb: 2}}>{error.error || error.data.message}</Alert>}
+      <DataGrid
+        rows={rows}
+        rowCount={rowCount}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 5,
+            },
           },
-        },
-      }}
-      pageSizeOptions={[5, 10, 20]}
-      // checkboxSelection
-      disableRowSelectionOnClick
-    />
+        }}
+        pageSizeOptions={pageSizeOptions}
+        paginationModel={paginationModel}
+        paginationMode='server'
+        onPaginationModelChange={setPaginationModel}
+        sortModel={sortModel}
+        sortingMode='server'
+        onSortModelChange={setSortModel}
+        // checkboxSelection
+        disableRowSelectionOnClick
+        loading={isLoading}
+        slotProps={{
+          loadingOverlay: {
+            variant: 'circular-progress',
+            noRowsVariant: 'circular-progress',
+          },
+        }}
+      />
+    </>
   )
 }

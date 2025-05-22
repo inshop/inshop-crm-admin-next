@@ -15,7 +15,13 @@ const injectedRtkApi = api.injectEndpoints({
       GroupsControllerFindAllApiResponse,
       GroupsControllerFindAllApiArg
     >({
-      query: (queryArg) => ({ url: `/api/admin/groups` }),
+      query: (queryArg) => ({
+        url: `/api/admin/groups`,
+        params: {
+          take: queryArg.take,
+          skip: queryArg.skip,
+        },
+      }),
     }),
     groupsControllerFindOne: build.query<
       GroupsControllerFindOneApiResponse,

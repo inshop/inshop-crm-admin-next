@@ -15,7 +15,13 @@ const injectedRtkApi = api.injectEndpoints({
       UsersControllerFindAllApiResponse,
       UsersControllerFindAllApiArg
     >({
-      query: (queryArg) => ({ url: `/api/admin/users` }),
+      query: (queryArg) => ({
+        url: `/api/admin/users`,
+        params: {
+          take: queryArg.take,
+          skip: queryArg.skip,
+        },
+      }),
     }),
     usersControllerFindOne: build.query<
       UsersControllerFindOneApiResponse,
