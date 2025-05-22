@@ -25,8 +25,6 @@ export default function CustomDataGrid({ query, columns }: CustomDataGridType) {
   const rows = useMemo(() => data && data[0] || [], [data])
   const rowCount = useMemo(() => data && data[1] || 0, [data])
 
-  // console.log('error', error)
-
   return (
     <>
       {error && <Alert severity="error" sx={{mb: 2}}>{error.error || error.data.message}</Alert>}
