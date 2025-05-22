@@ -19,7 +19,7 @@ const config: ConfigFile = {
       filterEndpoints: [/groups/i],
     },
     './src/lib/redux/features/modules.ts': {
-      filterEndpoints: [/groups/i],
+      filterEndpoints: [/modules/i],
     },
     './src/lib/redux/features/clients.ts': {
       filterEndpoints: [/clients/i],

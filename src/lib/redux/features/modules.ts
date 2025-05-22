@@ -1,50 +1,50 @@
 import { api } from "../api";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
-    groupsControllerCreate: build.mutation<
-      GroupsControllerCreateApiResponse,
-      GroupsControllerCreateApiArg
+    modulesControllerCreate: build.mutation<
+      ModulesControllerCreateApiResponse,
+      ModulesControllerCreateApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/admin/groups`,
+        url: `/api/admin/modules`,
         method: "POST",
-        body: queryArg.createGroupDto,
+        body: queryArg.createModuleDto,
       }),
     }),
-    groupsControllerFindAll: build.query<
-      GroupsControllerFindAllApiResponse,
-      GroupsControllerFindAllApiArg
+    modulesControllerFindAll: build.query<
+      ModulesControllerFindAllApiResponse,
+      ModulesControllerFindAllApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/admin/groups`,
+        url: `/api/admin/modules`,
         params: {
           take: queryArg.take,
           skip: queryArg.skip,
         },
       }),
     }),
-    groupsControllerFindOne: build.query<
-      GroupsControllerFindOneApiResponse,
-      GroupsControllerFindOneApiArg
+    modulesControllerFindOne: build.query<
+      ModulesControllerFindOneApiResponse,
+      ModulesControllerFindOneApiArg
     >({
-      query: (queryArg) => ({ url: `/api/admin/groups/${queryArg.id}` }),
+      query: (queryArg) => ({ url: `/api/admin/modules/${queryArg.id}` }),
     }),
-    groupsControllerUpdate: build.mutation<
-      GroupsControllerUpdateApiResponse,
-      GroupsControllerUpdateApiArg
+    modulesControllerUpdate: build.mutation<
+      ModulesControllerUpdateApiResponse,
+      ModulesControllerUpdateApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/admin/groups/${queryArg.id}`,
+        url: `/api/admin/modules/${queryArg.id}`,
         method: "PATCH",
-        body: queryArg.updateGroupDto,
+        body: queryArg.updateModuleDto,
       }),
     }),
-    groupsControllerRemove: build.mutation<
-      GroupsControllerRemoveApiResponse,
-      GroupsControllerRemoveApiArg
+    modulesControllerRemove: build.mutation<
+      ModulesControllerRemoveApiResponse,
+      ModulesControllerRemoveApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/admin/groups/${queryArg.id}`,
+        url: `/api/admin/modules/${queryArg.id}`,
         method: "DELETE",
       }),
     }),
@@ -52,41 +52,39 @@ const injectedRtkApi = api.injectEndpoints({
   overrideExisting: false,
 });
 export { injectedRtkApi as api };
-export type GroupsControllerCreateApiResponse = unknown;
-export type GroupsControllerCreateApiArg = {
-  createGroupDto: CreateGroupDto;
+export type ModulesControllerCreateApiResponse = unknown;
+export type ModulesControllerCreateApiArg = {
+  createModuleDto: CreateModuleDto;
 };
-export type GroupsControllerFindAllApiResponse = unknown;
-export type GroupsControllerFindAllApiArg = {
+export type ModulesControllerFindAllApiResponse = unknown;
+export type ModulesControllerFindAllApiArg = {
   take: number;
   skip: number;
 };
-export type GroupsControllerFindOneApiResponse = unknown;
-export type GroupsControllerFindOneApiArg = {
-  id: Group;
+export type ModulesControllerFindOneApiResponse = unknown;
+export type ModulesControllerFindOneApiArg = {
+  id: Module;
 };
-export type GroupsControllerUpdateApiResponse = unknown;
-export type GroupsControllerUpdateApiArg = {
-  id: Group;
-  updateGroupDto: UpdateGroupDto;
+export type ModulesControllerUpdateApiResponse = unknown;
+export type ModulesControllerUpdateApiArg = {
+  id: Module;
+  updateModuleDto: UpdateModuleDto;
 };
-export type GroupsControllerRemoveApiResponse = unknown;
-export type GroupsControllerRemoveApiArg = {
-  id: Group;
+export type ModulesControllerRemoveApiResponse = unknown;
+export type ModulesControllerRemoveApiArg = {
+  id: Module;
 };
-export type CreateGroupDto = {
+export type CreateModuleDto = {
   name: string;
-  roles: string[];
 };
-export type Group = {};
-export type UpdateGroupDto = {
+export type Module = {};
+export type UpdateModuleDto = {
   name: string;
-  roles: string[];
 };
 export const {
-  useGroupsControllerCreateMutation,
-  useGroupsControllerFindAllQuery,
-  useGroupsControllerFindOneQuery,
-  useGroupsControllerUpdateMutation,
-  useGroupsControllerRemoveMutation,
+  useModulesControllerCreateMutation,
+  useModulesControllerFindAllQuery,
+  useModulesControllerFindOneQuery,
+  useModulesControllerUpdateMutation,
+  useModulesControllerRemoveMutation,
 } = injectedRtkApi;
