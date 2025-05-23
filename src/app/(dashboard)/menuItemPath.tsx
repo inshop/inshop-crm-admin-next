@@ -8,11 +8,12 @@ import {MenuItemType} from "@/app/(dashboard)/menu";
 
 interface MenuItemProps {
   menuItem: MenuItemType;
+  sx?: object;
 }
 
-export default function MenuItemPath({ menuItem }: MenuItemProps) {
+export default function MenuItemPath({ menuItem, sx }: MenuItemProps) {
   return (
-    <ListItemButton href={menuItem.path || '#'}>
+    <ListItemButton href={menuItem.path || '#'} sx={sx}>
       <ListItemIcon>{menuItem.icon}</ListItemIcon>
       <ListItemText primary={menuItem.name} />
     </ListItemButton>

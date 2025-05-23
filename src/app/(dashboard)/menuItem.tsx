@@ -16,14 +16,14 @@ interface MenuItemProps {
 }
 
 export default function MenuItem({ menuItem }: MenuItemProps) {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
     setOpen(!open);
   };
 
   return (
-    <List>
+    <List disablePadding>
       {menuItem.path && <MenuItemPath menuItem={menuItem}></MenuItemPath>}
 
       {menuItem.children && menuItem.children.length > 0 && <>
@@ -36,7 +36,7 @@ export default function MenuItem({ menuItem }: MenuItemProps) {
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             {menuItem.children.map((menuItem, index) => (
-              <MenuItemPath key={index} menuItem={menuItem}></MenuItemPath>
+              <MenuItemPath key={index} menuItem={menuItem} sx={{ pl: 4 }}></MenuItemPath>
             ))}
           </List>
         </Collapse>
