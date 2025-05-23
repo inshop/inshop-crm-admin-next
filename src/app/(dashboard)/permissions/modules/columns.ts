@@ -18,25 +18,6 @@ export const columns: GridColDef[] = [
     sortable: false,
     disableColumnMenu: true,
   },
-  {
-    field: 'email',
-    headerName: 'email',
-    flex: 0.4,
-    minWidth: 200,
-    editable: true,
-    sortable: false,
-    disableColumnMenu: true,
-  },
-  {
-    field: 'isActive',
-    headerName: 'Active',
-    type: 'boolean',
-    flex: 0.1,
-    minWidth: 100,
-    editable: true,
-    sortable: false,
-    disableColumnMenu: true,
-  }
 ];
 
 export default columns;

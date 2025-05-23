@@ -29,9 +29,6 @@ const menuItems = [{
   name: 'Groups',
   path: '/permissions/groups',
 }, {
-  name: 'Roles',
-  path: '/permissions/roles',
-}, {
   name: 'Modules',
   path: '/permissions/modules',
 }]

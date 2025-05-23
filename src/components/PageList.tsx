@@ -1,13 +1,12 @@
 'use client'
 
-import * as React from 'react'
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import CustomDataGrid from "@/components/CustomDataGrid";
 import {GridColDef} from "@mui/x-data-grid";
 import {capitalize} from "@mui/material";
 import pluralize from "pluralize";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
 interface PageListType {
   title: string,
@@ -16,7 +15,7 @@ interface PageListType {
 }
 
 export default function PageList({ title, entity, columns }: PageListType) {
-  const [api, setApi] = React.useState(null)
+  const [api, setApi] = useState(null)
   const key = `use${capitalize(pluralize(entity))}ControllerFindAllQuery`;
 
   useEffect(() => {

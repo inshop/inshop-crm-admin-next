@@ -28,6 +28,18 @@ export const columns: GridColDef[] = [
     disableColumnMenu: true,
   },
   {
+    field: 'group',
+    headerName: 'Group',
+    flex: 0.4,
+    minWidth: 200,
+    editable: true,
+    sortable: false,
+    disableColumnMenu: true,
+    renderCell: (params) => {
+      return params.row.group ? params.row.group.name : 'No Group';
+    }
+  },
+  {
     field: 'isActive',
     headerName: 'Active',
     type: 'boolean',
