@@ -7,6 +7,8 @@ import {Alert} from "@mui/material";
 import {UseQuery} from '@reduxjs/toolkit/src/query/react/buildHooks'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import DialogDetails from "@/components/DialogDetails";
+import DialogEdit from "@/components/DialogEdit";
 
 interface CustomDataGridType {
   query: UseQuery<unknown>,
@@ -28,15 +30,26 @@ export default function CustomDataGrid({
 
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
   const [sortModel, setSortModel] = useState<GridSortModel>([])
+  const [detailsOpen, setDetailsOpen] = useState<boolean>(false)
+  const [editOpen, setEditOpen] = useState<boolean>(false)
+  const [selectedRow, setSelectedRow] = useState<number|null>(null)
+
+  const handleRowClick = (params: GridRowParams) => {
+    if (canView && params.row.id) {
+      setSelectedRow(params.row.id)
+      setDetailsOpen(true)
+    }
+  }
 
   const handleEdit = (params: GridRowParams) => {
-    if (params.row.id) {
-      console.log('Edit row:', params.row)
+    if (canEdit && params.row.id) {
+      setSelectedRow(params.row.id)
+      setEditOpen(true)
     }
   }
 
   const handleDelete = (params: GridRowParams) => {
-    if (params.row.id && confirm('Are you sure you want to delete this item?')) {
+    if (canDelete && params.row.id && confirm('Are you sure you want to delete this item?')) {
       console.log('Delete row:', params.row)
     }
   }
@@ -115,7 +128,7 @@ export default function CustomDataGrid({
         sortModel={sortModel}
         sortingMode='server'
         onSortModelChange={setSortModel}
-        // checkboxSelection
+        onRowClick={handleRowClick}
         disableRowSelectionOnClick
         loading={isLoading}
         slotProps={{
@@ -124,7 +137,16 @@ export default function CustomDataGrid({
             noRowsVariant: 'circular-progress',
           },
         }}
+        sx={{
+          '& .MuiDataGrid-row:hover': {
+            cursor: canView ? 'pointer' : ''
+          },
+        }}
       />
+      {selectedRow && <>
+        <DialogDetails open={detailsOpen} handleClose={() => setDetailsOpen(false)} rowId={selectedRow}></DialogDetails>
+        <DialogEdit open={editOpen} handleClose={() => setEditOpen(false)} rowId={selectedRow}></DialogEdit>
+      </>}
     </>
   )
 }
