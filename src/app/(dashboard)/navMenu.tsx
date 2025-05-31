@@ -7,7 +7,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import GroupsIcon from '@mui/icons-material/Groups';
 import FaceIcon from '@mui/icons-material/Face';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import MenuItem from "@/app/(dashboard)/menuItem";
+import NavMenuItem from "@/app/(dashboard)/navMenuItem";
 
 export interface MenuItemType {
   name: string;
@@ -38,11 +38,11 @@ const menuItems: MenuItemType[] = [{
   }]
 }]
 
-export default function Menu() {
+export default function NavMenu() {
   return (
     <List>
       {menuItems.map((menuItem, index) => (
-        <MenuItem key={index} menuItem={menuItem}></MenuItem>
+        <NavMenuItem key={index} menuItem={menuItem}></NavMenuItem>
       ))}
     </List>
   );

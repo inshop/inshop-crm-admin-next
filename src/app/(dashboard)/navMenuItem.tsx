@@ -8,14 +8,14 @@ import ListItemText from '@mui/material/ListItemText';
 import {Collapse} from "@mui/material";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import {MenuItemType} from "@/app/(dashboard)/menu";
-import MenuItemPath from "@/app/(dashboard)/menuItemPath";
+import {MenuItemType} from "@/app/(dashboard)/navMenu";
+import NavMenuItemPath from "@/app/(dashboard)/navMenuItemPath";
 
 interface MenuItemProps {
   menuItem: MenuItemType;
 }
 
-export default function MenuItem({ menuItem }: MenuItemProps) {
+export default function NavMenuItem({ menuItem }: MenuItemProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
@@ -24,7 +24,7 @@ export default function MenuItem({ menuItem }: MenuItemProps) {
 
   return (
     <List disablePadding>
-      {menuItem.path && <MenuItemPath menuItem={menuItem}></MenuItemPath>}
+      {menuItem.path && <NavMenuItemPath menuItem={menuItem}></NavMenuItemPath>}
 
       {menuItem.children && menuItem.children.length > 0 && <>
         <ListItemButton onClick={handleClick}>
@@ -36,7 +36,7 @@ export default function MenuItem({ menuItem }: MenuItemProps) {
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             {menuItem.children.map((menuItem, index) => (
-              <MenuItemPath key={index} menuItem={menuItem} sx={{ pl: 4 }}></MenuItemPath>
+              <NavMenuItemPath key={index} menuItem={menuItem} sx={{ pl: 4 }}></NavMenuItemPath>
             ))}
           </List>
         </Collapse>
