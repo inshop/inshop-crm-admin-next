@@ -146,8 +146,8 @@ export default function CustomDataGrid({
         }}
       />
       {selectedRow && <>
-        <DialogDetails entity={entity} open={detailsOpen} handleClose={() => setDetailsOpen(false)} rowId={selectedRow}></DialogDetails>
-        <DialogEdit entity={entity} open={editOpen} handleClose={() => setEditOpen(false)} rowId={selectedRow}></DialogEdit>
+        <DialogDetails entity={entity} open={detailsOpen} handleClose={() => setDetailsOpen(false)} id={selectedRow}></DialogDetails>
+        <DialogEdit entity={entity} open={editOpen} handleClose={() => setEditOpen(false)} id={selectedRow}></DialogEdit>
       </>}
     </>
   )

@@ -4,13 +4,13 @@ interface DialogDetailsProps {
   entity: string
   open: boolean
   handleClose(): void
-  rowId: number
+  id: number
 }
 
-const DialogDetails = ({ entity, open, handleClose, rowId }: DialogDetailsProps) => {
+const DialogDetails = ({ entity, open, handleClose, id }: DialogDetailsProps) => {
   return (
     <CustomDialog open={open} handleClose={handleClose}>
-      Edit form for row ID: {rowId}
+      Edit form for row ID: {id}
     </CustomDialog>
   )
 }
