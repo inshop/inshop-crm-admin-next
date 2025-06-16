@@ -29,7 +29,11 @@ export default function PageList({ title, entity, columns }: PageListType) {
       <Typography variant="h2">{title}</Typography>
 
       <Box sx={{ width: '100%', mt: 4 }}>
-        {api && <CustomDataGrid query={api[key]} columns={columns}></CustomDataGrid>}
+        {api && <CustomDataGrid
+          entity={entity}
+          query={api[key]}
+          columns={columns}
+        ></CustomDataGrid>}
       </Box>
     </>
   )

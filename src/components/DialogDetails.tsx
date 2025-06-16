@@ -1,12 +1,13 @@
 import CustomDialog from "@/components/CustomDialog";
 
 interface DialogDetailsProps {
+  entity: string
   open: boolean
   handleClose(): void
   rowId: number
 }
 
-const DialogDetails = ({ open, handleClose, rowId }: DialogDetailsProps) => {
+const DialogDetails = ({ entity, open, handleClose, rowId }: DialogDetailsProps) => {
   return (
     <CustomDialog open={open} handleClose={handleClose}>
       Details for row ID: {rowId}

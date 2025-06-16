@@ -12,16 +12,18 @@ import DialogEdit from "@/components/DialogEdit";
 
 interface CustomDataGridType {
   query: UseQuery<unknown>,
+  entity: string,
   columns: GridColDef[],
-  canView: boolean
-  canEdit: boolean
-  canDelete: boolean
+  canView?: boolean
+  canEdit?: boolean
+  canDelete?: boolean
 }
 
 const pageSizeOptions = [5, 10, 25, 50, 100]
 
 export default function CustomDataGrid({
     query,
+    entity,
     columns,
     canView = true,
     canEdit = true,
@@ -144,8 +146,8 @@ export default function CustomDataGrid({
         }}
       />
       {selectedRow && <>
-        <DialogDetails open={detailsOpen} handleClose={() => setDetailsOpen(false)} rowId={selectedRow}></DialogDetails>
-        <DialogEdit open={editOpen} handleClose={() => setEditOpen(false)} rowId={selectedRow}></DialogEdit>
+        <DialogDetails entity={entity} open={detailsOpen} handleClose={() => setDetailsOpen(false)} rowId={selectedRow}></DialogDetails>
+        <DialogEdit entity={entity} open={editOpen} handleClose={() => setEditOpen(false)} rowId={selectedRow}></DialogEdit>
       </>}
     </>
   )
