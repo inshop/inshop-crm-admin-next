@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {Alert, capitalize} from "@mui/material";
+import {Alert, capitalize, CircularProgress} from "@mui/material";
 import {UseQuery} from '@reduxjs/toolkit/src/query/react/buildHooks'
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
@@ -9,6 +9,7 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
+import Box from "@mui/material/Box";
 
 interface CustomTableDataType {
   query: UseQuery<unknown>,
@@ -40,6 +41,13 @@ export default function CustomTableData({
   return (
     <>
       {error && <Alert severity="error" sx={{mb: 2}}>{error.error || error.data.message}</Alert>}
+      {isLoading && <Box sx={{
+        width: '100px',
+        display: 'flex',
+        margin: '100px auto'
+      }}>
+          <CircularProgress />
+      </Box>}
 
       <TableContainer component={Paper}>
         <Table sx={{ width: '100%', tableLayout: 'fixed' }}>
