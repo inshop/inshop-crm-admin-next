@@ -28,10 +28,7 @@ export default function CustomTableData({
     canDelete = true
   }: CustomTableDataType) {
 
-
-  const { data, error, isLoading } = query({
-    id,
-  })
+  const { data, error, isLoading } = query({ id })
 
   const renderValue = (value: any): string => {
     if (value === null || value === undefined) return '-'
@@ -45,7 +42,7 @@ export default function CustomTableData({
       {error && <Alert severity="error" sx={{mb: 2}}>{error.error || error.data.message}</Alert>}
 
       <TableContainer component={Paper}>
-        <Table>
+        <Table sx={{ width: '100%', tableLayout: 'fixed' }}>
           <TableBody>
             {data && Object.entries(data).map(([key, value]) => (
               <TableRow key={key}>
