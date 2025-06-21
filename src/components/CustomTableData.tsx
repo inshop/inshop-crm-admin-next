@@ -13,7 +13,7 @@ import Box from "@mui/material/Box";
 
 interface CustomTableDataType {
   query: UseQuery<unknown>,
-  entity: string,
+  columns: string[],
   id: number,
   canView?: boolean
   canEdit?: boolean
@@ -22,16 +22,13 @@ interface CustomTableDataType {
 
 export default function CustomTableData({
     query,
-    entity,
+    columns,
     id,
-    canView = true,
-    canEdit = true,
-    canDelete = true
   }: CustomTableDataType) {
 
   const { data, error, isLoading } = query({ id })
 
-  const renderValue = (value: any): string => {
+  const renderValue = (value: unknown): string => {
     if (value === null || value === undefined) return '-'
     if (typeof value === 'boolean') return value ? 'Yes' : 'No'
     if (typeof value === 'object') return JSON.stringify(value)
@@ -52,8 +49,8 @@ export default function CustomTableData({
       <TableContainer component={Paper}>
         <Table sx={{ width: '100%', tableLayout: 'fixed' }}>
           <TableBody>
-            {data && Object.entries(data).map(([key, value]) => (
-              <TableRow key={key}>
+            {data && columns.map((column) => (
+              <TableRow key={column}>
                 <TableCell
                   component="th"
                   scope="row"
@@ -63,9 +60,9 @@ export default function CustomTableData({
                     backgroundColor: 'rgba(0, 0, 0, 0.02)'
                   }}
                 >
-                  {capitalize(key.replace(/_/g, ' '))}
+                  {capitalize(column.replace(/_/g, ' '))}
                 </TableCell>
-                <TableCell>{renderValue(value)}</TableCell>
+                <TableCell>{renderValue(data[column])}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -16,7 +16,7 @@ interface DialogDetailsProps {
   id: number
 }
 
-const DialogDetails = ({ entity, open, handleClose, id }: DialogDetailsProps) => {
+const DialogDetails = ({ entity, open, handleClose, id, columns }: DialogDetailsProps) => {
   const [api, setApi] = useState(null)
   const key = `use${capitalize(pluralize(entity))}ControllerFindOneQuery`
 
@@ -34,7 +34,7 @@ const DialogDetails = ({ entity, open, handleClose, id }: DialogDetailsProps) =>
 
       <Box sx={{ width: '100%', mt: 4 }}>
         {api && <CustomTableData
-          entity={entity}
+          columns={columns}
           query={api[key]}
           id={id}
         ></CustomTableData>}

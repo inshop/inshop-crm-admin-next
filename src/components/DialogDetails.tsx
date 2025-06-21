@@ -4,8 +4,8 @@ import CustomDialog from "@/components/CustomDialog";
 import {useEffect, useState} from "react";
 import {capitalize} from "@mui/material";
 import pluralize from "pluralize";
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import CustomTableData from "@/components/CustomTableData";
 
 interface DialogDetailsProps {
@@ -16,7 +16,7 @@ interface DialogDetailsProps {
   id: number
 }
 
-const DialogDetails = ({ entity, open, handleClose, id }: DialogDetailsProps) => {
+const DialogDetails = ({ entity, open, handleClose, id, columns }: DialogDetailsProps) => {
   const [api, setApi] = useState(null)
   const key = `use${capitalize(pluralize(entity))}ControllerFindOneQuery`
 
@@ -34,7 +34,7 @@ const DialogDetails = ({ entity, open, handleClose, id }: DialogDetailsProps) =>
 
       <Box sx={{ width: '100%', mt: 4 }}>
         {api && <CustomTableData
-          entity={entity}
+          columns={columns}
           query={api[key]}
           id={id}
         ></CustomTableData>}
