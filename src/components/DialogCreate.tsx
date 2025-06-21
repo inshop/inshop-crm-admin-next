@@ -1,16 +1,13 @@
-'use client'
-
 import CustomDialog from "@/components/CustomDialog";
 import {useEffect, useState} from "react";
 import {capitalize} from "@mui/material";
 import pluralize from "pluralize";
-import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import CustomTableData from "@/components/CustomTableData";
 
 interface DialogDetailsProps {
   entity: string
-  columns: string[]
   open: boolean
   handleClose(): void
   id: number
@@ -29,14 +26,14 @@ const DialogDetails = ({ entity, open, handleClose, id }: DialogDetailsProps) =>
   return (
     <CustomDialog open={open} handleClose={handleClose}>
       <Typography variant="h4" sx={{ mb: 4 }}>
-        Edit {capitalize(entity)}
+        Create {capitalize(entity)}
       </Typography>
 
       <Box sx={{ width: '100%', mt: 4 }}>
         {api && <CustomTableData
-          entity={entity}
-          query={api[key]}
-          id={id}
+            entity={entity}
+            query={api[key]}
+            id={id}
         ></CustomTableData>}
       </Box>
     </CustomDialog>

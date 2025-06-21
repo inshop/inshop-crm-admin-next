@@ -1,6 +1,6 @@
 import {GridColDef} from "@mui/x-data-grid";
 
-export const columns: GridColDef[] = [
+export const columnsList: GridColDef[] = [
   {
     field: 'id',
     headerName: 'ID',
@@ -39,4 +39,10 @@ export const columns: GridColDef[] = [
   }
 ];
 
-export default columns;
+export const columnsDetails = [
+  'id', 'name', 'email', 'isActive'
+]
+
+export const columnsEdit = [
+  'id', 'name', 'email', 'isActive'
+]

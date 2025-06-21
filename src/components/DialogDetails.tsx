@@ -10,6 +10,7 @@ import CustomTableData from "@/components/CustomTableData";
 
 interface DialogDetailsProps {
   entity: string
+  columns: string[]
   open: boolean
   handleClose(): void
   id: number

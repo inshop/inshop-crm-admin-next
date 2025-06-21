@@ -13,7 +13,9 @@ import DialogEdit from "@/components/DialogEdit";
 interface CustomDataGridType {
   query: UseQuery<unknown>,
   entity: string,
-  columns: GridColDef[],
+  columnsList: GridColDef[],
+  columnsDetails: string[],
+  columnsEdit: string[],
   canView?: boolean
   canEdit?: boolean
   canDelete?: boolean
@@ -24,7 +26,9 @@ const pageSizeOptions = [5, 10, 25, 50, 100]
 export default function CustomDataGrid({
     query,
     entity,
-    columns,
+    columnsList,
+    columnsDetails,
+    columnsEdit,
     canView = true,
     canEdit = true,
     canDelete = true
@@ -57,7 +61,7 @@ export default function CustomDataGrid({
   }
 
   const _columns = useMemo(() => {
-    const _columns = [...columns]
+    const _columns = [...columnsList]
 
     if (canEdit || canDelete) {
       _columns.push({
@@ -99,7 +103,7 @@ export default function CustomDataGrid({
     }
 
     return _columns
-  }, [columns, canEdit, canDelete])
+  }, [columnsList, canEdit, canDelete])
 
   const { data, error, isLoading } = query({
     take: paginationModel.pageSize,
@@ -146,8 +150,20 @@ export default function CustomDataGrid({
         }}
       />
       {selectedRow && <>
-        <DialogDetails entity={entity} open={detailsOpen} handleClose={() => setDetailsOpen(false)} id={selectedRow}></DialogDetails>
-        <DialogEdit entity={entity} open={editOpen} handleClose={() => setEditOpen(false)} id={selectedRow}></DialogEdit>
+        <DialogDetails
+          id={selectedRow}
+          entity={entity}
+          columns={columnsDetails}
+          open={detailsOpen}
+          handleClose={() => setDetailsOpen(false)}
+        ></DialogDetails>
+        <DialogEdit
+          id={selectedRow}
+          entity={entity}
+          columns={columnsEdit}
+          open={editOpen}
+          handleClose={() => setEditOpen(false)}
+        ></DialogEdit>
       </>}
     </>
   )

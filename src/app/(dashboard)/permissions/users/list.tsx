@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import PageList from "@/components/PageList";
-import columns from "@/app/(dashboard)/permissions/users/columns";
+import {columnsList, columnsDetails, columnsEdit} from "@/app/(dashboard)/permissions/users/columns";
 
 interface ListType {
   title: string,
@@ -11,6 +11,12 @@ interface ListType {
 
 export default function List({ title, entity }: ListType) {
   return (
-    <PageList title={title} entity={entity} columns={columns}></PageList>
+    <PageList
+      title={title}
+      entity={entity}
+      columnsList={columnsList}
+      columnsDetails={columnsDetails}
+      columnsEdit={columnsEdit}
+    ></PageList>
   )
 }

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type {Metadata} from 'next'
 import PageList from '@/components/PageList'
-import columns from "@/app/(dashboard)/clients/columns";
+import {columnsList, columnsDetails, columnsEdit} from "@/app/(dashboard)/clients/columns";
 
 const title = 'Clients'
 const entity = 'client'
@@ -13,6 +13,12 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <PageList title={title} entity={entity} columns={columns}></PageList>
+    <PageList
+      title={title}
+      entity={entity}
+      columnsList={columnsList}
+      columnsDetails={columnsDetails}
+      columnsEdit={columnsEdit}
+    ></PageList>
   )
 }

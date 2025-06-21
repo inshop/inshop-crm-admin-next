@@ -11,10 +11,12 @@ import {useEffect, useState} from "react";
 interface PageListType {
   title: string,
   entity: string,
-  columns: GridColDef[],
+  columnsList: GridColDef[],
+  columnsDetails: string[],
+  columnsEdit: string[],
 }
 
-export default function PageList({ title, entity, columns }: PageListType) {
+export default function PageList({ title, entity, columnsList, columnsDetails, columnsEdit }: PageListType) {
   const [api, setApi] = useState(null)
   const key = `use${capitalize(pluralize(entity))}ControllerFindAllQuery`;
 
@@ -32,7 +34,9 @@ export default function PageList({ title, entity, columns }: PageListType) {
         {api && <CustomDataGrid
           entity={entity}
           query={api[key]}
-          columns={columns}
+          columnsList={columnsList}
+          columnsDetails={columnsDetails}
+          columnsEdit={columnsEdit}
         ></CustomDataGrid>}
       </Box>
     </>
