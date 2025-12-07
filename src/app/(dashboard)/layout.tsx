@@ -16,12 +16,14 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import {Divider} from "@mui/material";
+import { useRouter } from 'next/navigation';
 
 const drawerWidth = 240;
 
 export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [auth, setAuth] = React.useState(true);
+  const [auth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const router = useRouter();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -29,6 +31,20 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleSignOut = async () => {
+    handleClose();
+    try {
+      await fetch('/api/admin/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (_e) {
+      // Ignore errors, proceed with redirect
+    }
+    // Redirect to sign-in page
+    router.replace('/');
   };
 
   return (
@@ -81,7 +97,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
                 <MenuItem onClick={handleClose}>Dashboard</MenuItem>
                 <MenuItem onClick={handleClose}>Reset password</MenuItem>
                 <Divider />
-                <MenuItem onClick={handleClose}>Sign out</MenuItem>
+                <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
               </Menu>
             </div>
           )}

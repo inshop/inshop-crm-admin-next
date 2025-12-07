@@ -1,99 +1,79 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import FormLabel from '@mui/material/FormLabel'
-import FormControl from '@mui/material/FormControl'
-import Link from '@mui/material/Link'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import NextLink from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useAuthControllerLoginMutation } from '@/lib/redux/features/auth'
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
+import Link from "@mui/material/Link";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuthControllerLoginMutation } from "@/lib/redux/features/auth";
 
 export default function Form() {
-  const [emailError, setEmailError] = React.useState(false)
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
-  const [passwordError, setPasswordError] = React.useState(false)
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('')
-  const [submitError, setSubmitError] = React.useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [emailError, setEmailError] = React.useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const router = useRouter()
-  const [login] = useAuthControllerLoginMutation()
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+  const router = useRouter();
+  const [login] = useAuthControllerLoginMutation();
 
   const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement
-    const password = document.getElementById('password') as HTMLInputElement
+    setEmailError(false);
+    setEmailErrorMessage("");
+    setPasswordError(false);
+    setPasswordErrorMessage("");
 
-    let isValid = true
+    if (!email) {
+      setEmailError(true);
+      setEmailErrorMessage("Please enter a valid email address.");
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true)
-      setEmailErrorMessage('Please enter a valid email address.')
-      isValid = false
-    } else {
-      setEmailError(false)
-      setEmailErrorMessage('')
+      return false;
     }
 
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true)
-      setPasswordErrorMessage('Password must be at least 6 characters long.')
-      isValid = false
-    } else {
-      setPasswordError(false)
-      setPasswordErrorMessage('')
+    if (!password) {
+      setPasswordError(true);
+      setPasswordErrorMessage("Password can not be empty.");
+
+      return false;
     }
 
-    return isValid
-  }
+    return true;
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setSubmitError(null)
+    event.preventDefault();
+    setSubmitError(null);
 
-    // validate before submit
     if (!validateInputs()) {
-      return
+      return;
     }
-
-    const data = new FormData(event.currentTarget)
-    const email = String(data.get('email') || '')
-    const password = String(data.get('password') || '')
 
     try {
-      setIsSubmitting(true)
-      const res = await login({ loginAuthDto: { email, password } }).unwrap()
-      // Expect token in response - try common keys
-      const token =
-        (res && (res as any).token) || (res && (res as any).accessToken) || null
-
-      if (!token) {
-        throw new Error('Invalid response: no token provided')
-      }
-
-      // Save token into cookie (client-side)
-      // Set cookie for the whole site; adjust attributes as needed
-      document.cookie = `token=${encodeURIComponent(token)}; Path=/; SameSite=Lax` // consider Secure if served over HTTPS
-
-      // redirect to homepage
-      router.replace('/clients')
-    } catch (err: any) {
-      const msg = err?.data?.message || err?.message || 'Login failed'
-      setSubmitError(Array.isArray(msg) ? msg.join(', ') : String(msg))
+      setIsSubmitting(true);
+      await login({ loginAuthDto: { email, password } }).unwrap();
+      router.replace("/clients");
+    } catch(e) {
+      setSubmitError(e.data.message || "Login failed");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <>
       <Typography
         component="h1"
         variant="h4"
-        sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+        sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
       >
         Sign in
       </Typography>
@@ -102,9 +82,9 @@ export default function Form() {
         onSubmit={handleSubmit}
         noValidate
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
           gap: 2,
         }}
       >
@@ -122,7 +102,9 @@ export default function Form() {
             required
             fullWidth
             variant="outlined"
-            color={emailError ? 'error' : 'primary'}
+            color={emailError ? "error" : "primary"}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </FormControl>
         <FormControl>
@@ -138,7 +120,9 @@ export default function Form() {
             required
             fullWidth
             variant="outlined"
-            color={passwordError ? 'error' : 'primary'}
+            color={passwordError ? "error" : "primary"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </FormControl>
         {submitError && (
@@ -146,19 +130,24 @@ export default function Form() {
             {submitError}
           </Typography>
         )}
-        <Button type="submit" fullWidth variant="contained" disabled={isSubmitting}>
-          {isSubmitting ? 'Signing in…' : 'Sign in'}
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
         <Link
           href="/reset-password"
           component={NextLink}
           type="button"
           variant="body2"
-          sx={{ alignSelf: 'center' }}
+          sx={{ alignSelf: "center" }}
         >
           Forgot your password?
         </Link>
       </Box>
     </>
-  )
+  );
 }

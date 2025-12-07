@@ -5,8 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        // TODO: move to .env
-        destination: "http://localhost:4000/api/:path*", // Proxy to Backend
+        destination: `${process.env.BACKEND_BASE_URL}/api/:path*`, // Proxy to Backend
       },
     ];
   }
