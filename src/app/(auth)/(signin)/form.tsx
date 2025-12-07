@@ -9,24 +9,19 @@ import Link from '@mui/material/Link'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import NextLink from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useAuthControllerLoginMutation } from '@/lib/redux/features/auth'
 
 export default function Form() {
   const [emailError, setEmailError] = React.useState(false)
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
   const [passwordError, setPasswordError] = React.useState(false)
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('')
+  const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault()
-      return
-    }
-    const data = new FormData(event.currentTarget)
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    })
-  }
+  const router = useRouter()
+  const [login] = useAuthControllerLoginMutation()
 
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement
@@ -53,6 +48,44 @@ export default function Form() {
     }
 
     return isValid
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setSubmitError(null)
+
+    // validate before submit
+    if (!validateInputs()) {
+      return
+    }
+
+    const data = new FormData(event.currentTarget)
+    const email = String(data.get('email') || '')
+    const password = String(data.get('password') || '')
+
+    try {
+      setIsSubmitting(true)
+      const res = await login({ loginAuthDto: { email, password } }).unwrap()
+      // Expect token in response - try common keys
+      const token =
+        (res && (res as any).token) || (res && (res as any).accessToken) || null
+
+      if (!token) {
+        throw new Error('Invalid response: no token provided')
+      }
+
+      // Save token into cookie (client-side)
+      // Set cookie for the whole site; adjust attributes as needed
+      document.cookie = `token=${encodeURIComponent(token)}; Path=/; SameSite=Lax` // consider Secure if served over HTTPS
+
+      // redirect to homepage
+      router.replace('/clients')
+    } catch (err: any) {
+      const msg = err?.data?.message || err?.message || 'Login failed'
+      setSubmitError(Array.isArray(msg) ? msg.join(', ') : String(msg))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -102,20 +135,19 @@ export default function Form() {
             type="password"
             id="password"
             autoComplete="current-password"
-            autoFocus
             required
             fullWidth
             variant="outlined"
             color={passwordError ? 'error' : 'primary'}
           />
         </FormControl>
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          onClick={validateInputs}
-        >
-          Sign in
+        {submitError && (
+          <Typography color="error" variant="body2">
+            {submitError}
+          </Typography>
+        )}
+        <Button type="submit" fullWidth variant="contained" disabled={isSubmitting}>
+          {isSubmitting ? 'Signing in…' : 'Sign in'}
         </Button>
         <Link
           href="/reset-password"
