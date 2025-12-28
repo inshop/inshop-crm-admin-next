@@ -1,15 +1,19 @@
-import * as React from 'react'
-import type {Metadata} from "next";
+import * as React from "react";
+import type { Metadata } from "next";
 import PageList from "@/components/PageList";
-import {columnsList, columnsDetails, columnsEdit} from "@/app/(dashboard)/permissions/modules/columns";
+import {
+  columnsList,
+  columnsDetails,
+  columnsEdit,
+} from "@/app/(dashboard)/permissions/modules/columns";
 
-const title = 'Modules'
-const entity = 'module'
+const title = "Modules";
+const entity = "module";
 
 export const metadata: Metadata = {
   title,
   description: title,
-}
+};
 
 export default function Page() {
   return (
@@ -20,5 +24,5 @@ export default function Page() {
       columnsDetails={columnsDetails}
       columnsEdit={columnsEdit}
     ></PageList>
-  )
+  );
 }

@@ -1,55 +1,55 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import FormLabel from '@mui/material/FormLabel'
-import FormControl from '@mui/material/FormControl'
-import Link from '@mui/material/Link'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import NextLink from 'next/link'
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
+import Link from "@mui/material/Link";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import NextLink from "next/link";
 
 export default function Form() {
-  const [emailError, setEmailError] = React.useState(false)
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
+  const [emailError, setEmailError] = React.useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     if (emailError) {
-      event.preventDefault()
-      return
+      event.preventDefault();
+      return;
     }
 
-    const data = new FormData(event.currentTarget)
+    const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    })
-  }
+      email: data.get("email"),
+      password: data.get("password"),
+    });
+  };
 
   const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement
+    const email = document.getElementById("email") as HTMLInputElement;
 
-    let isValid = true
+    let isValid = true;
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true)
-      setEmailErrorMessage('Please enter a valid email address.')
-      isValid = false
+      setEmailError(true);
+      setEmailErrorMessage("Please enter a valid email address.");
+      isValid = false;
     } else {
-      setEmailError(false)
-      setEmailErrorMessage('')
+      setEmailError(false);
+      setEmailErrorMessage("");
     }
 
-    return isValid
-  }
+    return isValid;
+  };
 
   return (
     <>
       <Typography
         component="h1"
         variant="h4"
-        sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+        sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
       >
         Reset password
       </Typography>
@@ -58,9 +58,9 @@ export default function Form() {
         onSubmit={handleSubmit}
         noValidate
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
           gap: 2,
         }}
       >
@@ -78,7 +78,7 @@ export default function Form() {
             required
             fullWidth
             variant="outlined"
-            color={emailError ? 'error' : 'primary'}
+            color={emailError ? "error" : "primary"}
           />
         </FormControl>
         <Button
@@ -94,11 +94,11 @@ export default function Form() {
           component={NextLink}
           type="button"
           variant="body2"
-          sx={{ alignSelf: 'center' }}
+          sx={{ alignSelf: "center" }}
         >
           Back to sign in
         </Link>
       </Box>
     </>
-  )
+  );
 }

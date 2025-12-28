@@ -61,8 +61,10 @@ export default function Form() {
       setIsSubmitting(true);
       await login({ loginAuthDto: { email, password } }).unwrap();
       router.replace("/clients");
-    } catch(e) {
-      setSubmitError(e.data.message || "Login failed");
+    } catch (e: unknown) {
+      setSubmitError(
+        (e as { data: { message: string } }).data.message || "Login failed",
+      );
     } finally {
       setIsSubmitting(false);
     }

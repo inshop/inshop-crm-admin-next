@@ -1,26 +1,28 @@
-'use client'
+"use client";
 
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import AppBar from '@mui/material/AppBar';
-import CssBaseline from '@mui/material/CssBaseline';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import {Suspense} from "react";
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import AppBar from "@mui/material/AppBar";
+import CssBaseline from "@mui/material/CssBaseline";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { Suspense } from "react";
 import Loading from "@/app/(dashboard)/loading";
 import NavMenu from "./navMenu";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/material/MenuItem";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import {Divider} from "@mui/material";
-import { useRouter } from 'next/navigation';
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import { Divider } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 const drawerWidth = 240;
 
-export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function DashboardLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const [auth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const router = useRouter();
@@ -36,21 +38,24 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
   const handleSignOut = async () => {
     handleClose();
     try {
-      await fetch('/api/admin/auth/logout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/admin/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
     } catch (_e) {
       // Ignore errors, proceed with redirect
     }
     // Redirect to sign-in page
-    router.replace('/');
+    router.replace("/");
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar>
           <IconButton
             size="large"
@@ -83,13 +88,13 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
                 id="menu-appbar"
                 anchorEl={anchorEl}
                 anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
+                  vertical: "bottom",
+                  horizontal: "right",
                 }}
                 keepMounted
                 transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
@@ -108,19 +113,20 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: "border-box",
+          },
         }}
       >
         <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
+        <Box sx={{ overflow: "auto" }}>
           <NavMenu></NavMenu>
         </Box>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
-        <Suspense fallback={<Loading />}>
-          {children}
-        </Suspense>
+        <Suspense fallback={<Loading />}>{children}</Suspense>
       </Box>
     </Box>
   );
