@@ -1,30 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { setCookie } from "@/lib/auth";
 
 const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL;
-
-function getTokenExpiration(token: string): number | undefined {
-  const parts = token.split(".");
-  if (parts.length !== 3) return undefined;
-
-  const payload = JSON.parse(Buffer.from(parts[1], "base64").toString());
-  if (payload.exp && typeof payload.exp === "number") {
-    return Math.floor((payload.exp * 1000 - Date.now()) / 1000);
-  }
-}
-
-function setCookie(res: NextResponse, name: string, value: string) {
-  const maxAge = getTokenExpiration(value);
-
-  res.cookies.set({
-    name,
-    value,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge,
-  });
-}
 
 export async function POST(req: NextRequest) {
   try {

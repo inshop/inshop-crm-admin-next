@@ -1,14 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  rewrites: async () => {
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${process.env.BACKEND_BASE_URL}/api/:path*`, // Proxy to Backend
-      },
-    ];
-  }
+
 };
 
 export default nextConfig;
