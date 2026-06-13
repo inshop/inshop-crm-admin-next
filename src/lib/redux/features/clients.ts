@@ -78,12 +78,14 @@ export type CreateClientDto = {
   name: string;
   email: string;
   password: string;
+  isActive: boolean;
 };
 export type Client = {};
 export type UpdateClientDto = {
-  name: string;
-  email: string;
-  password: string;
+  name?: string;
+  email?: string;
+  password?: string;
+  isActive?: boolean;
 };
 export const {
   useClientsControllerCreateMutation,
