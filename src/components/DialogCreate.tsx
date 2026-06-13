@@ -121,6 +121,7 @@ function CreateForm({ api, entity, fields, open, handleClose }: CreateFormProps)
             config={field}
             value={formData[field.name]}
             onChange={handleChange}
+            enabled={open}
           />
         ))}
 

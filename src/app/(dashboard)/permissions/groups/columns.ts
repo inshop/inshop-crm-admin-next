@@ -28,7 +28,6 @@ export const formFields: FieldConfig[] = [
     name: "roles",
     type: "multiselect",
     label: "Roles",
-    optionsUrl: "/api/admin/modules?take=100&skip=0",
-    optionsPath: "roles",
+    optionsUrl: "/api/admin/roles?take=100&skip=0",
   },
 ];

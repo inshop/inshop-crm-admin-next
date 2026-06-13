@@ -25,22 +25,39 @@ interface FormFieldProps {
   value: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (field: string, value: any) => void;
+  /** When false, option loading is deferred (e.g. dialog closed). */
+  enabled?: boolean;
 }
 
-export default function FormField({ config, value, onChange }: FormFieldProps) {
+export default function FormField({
+  config,
+  value,
+  onChange,
+  enabled = true,
+}: FormFieldProps) {
   const label = config.label || capitalize(config.name.replace(/_/g, " "));
   const type = config.type || inferType(config.name);
+  const needsOptions =
+    (type === "select" || type === "multiselect") && !!config.optionsUrl;
 
   const [options, setOptions] = useState<{ id: number; label: string }[]>(
     config.options || [],
   );
+  const [loadingOptions, setLoadingOptions] = useState(false);
 
   useEffect(() => {
-    if (!config.optionsUrl || options.length > 0) return;
+    if (!needsOptions || !enabled) {
+      return;
+    }
 
-    fetch(config.optionsUrl, { credentials: "include" })
-      .then((res) => (res.ok ? res.json() : []))
+    let cancelled = false;
+    setLoadingOptions(true);
+
+    fetch(config.optionsUrl!, { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then((data) => {
+        if (cancelled) return;
+
         const labelKey = config.optionLabelKey || "name";
         const items = extractItems(data, config.optionsPath);
         setOptions(
@@ -51,8 +68,29 @@ export default function FormField({ config, value, onChange }: FormFieldProps) {
           })),
         );
       })
-      .catch(() => setOptions([]));
-  }, [config.optionsUrl, config.optionsPath, config.optionLabelKey, options.length]);
+      .catch(() => {
+        if (!cancelled) setOptions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingOptions(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    needsOptions,
+    enabled,
+    config.optionsUrl,
+    config.optionsPath,
+    config.optionLabelKey,
+  ]);
+
+  useEffect(() => {
+    if (!enabled) {
+      setOptions(config.options || []);
+    }
+  }, [enabled, config.options]);
 
   switch (type) {
     case "boolean":
@@ -98,6 +136,7 @@ export default function FormField({ config, value, onChange }: FormFieldProps) {
       return (
         <Autocomplete
           options={options}
+          loading={loadingOptions}
           getOptionLabel={(opt) => opt.label}
           value={options.find((o) => o.id === value?.id || o.id === value) || null}
           onChange={(_, newVal) => onChange(config.name, newVal ? newVal.id : null)}
@@ -113,6 +152,7 @@ export default function FormField({ config, value, onChange }: FormFieldProps) {
         <Autocomplete
           multiple
           options={options}
+          loading={loadingOptions}
           getOptionLabel={(opt) => opt.label}
           value={options.filter((o) =>
             Array.isArray(value)

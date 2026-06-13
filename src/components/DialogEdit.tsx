@@ -148,6 +148,7 @@ function EditForm({ api, entity, fields, id, open, handleClose }: EditFormProps)
             config={field}
             value={formData[field.name]}
             onChange={handleChange}
+            enabled={open}
           />
         ))}
 
