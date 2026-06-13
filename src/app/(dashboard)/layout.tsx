@@ -121,7 +121,6 @@ export default function DashboardLayout({
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}>Dashboard</MenuItem>
             <MenuItem
               onClick={() => {
                 handleClose();
