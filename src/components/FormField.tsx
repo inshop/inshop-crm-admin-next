@@ -1,12 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { capitalize } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Autocomplete from "@mui/material/Autocomplete";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export interface FieldConfig {
   name: string;
@@ -37,16 +38,18 @@ export default function FormField({
 }: FormFieldProps) {
   const label = config.label || capitalize(config.name.replace(/_/g, " "));
   const type = config.type || inferType(config.name);
-  const needsOptions =
+
+  const shouldFetchOptions =
     (type === "select" || type === "multiselect") && !!config.optionsUrl;
 
   const [options, setOptions] = useState<{ id: number; label: string }[]>(
     config.options || [],
   );
   const [loadingOptions, setLoadingOptions] = useState(false);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    if (!needsOptions || !enabled) {
+    if (!shouldFetchOptions || !enabled || hasFetchedRef.current) {
       return;
     }
 
@@ -67,6 +70,7 @@ export default function FormField({
             label: item[labelKey] || String(item.id),
           })),
         );
+        hasFetchedRef.current = true;
       })
       .catch(() => {
         if (!cancelled) setOptions([]);
@@ -79,18 +83,12 @@ export default function FormField({
       cancelled = true;
     };
   }, [
-    needsOptions,
+    shouldFetchOptions,
     enabled,
     config.optionsUrl,
     config.optionsPath,
     config.optionLabelKey,
   ]);
-
-  useEffect(() => {
-    if (!enabled) {
-      setOptions(config.options || []);
-    }
-  }, [enabled, config.options]);
 
   switch (type) {
     case "boolean":
@@ -138,10 +136,25 @@ export default function FormField({
           options={options}
           loading={loadingOptions}
           getOptionLabel={(opt) => opt.label}
+          isOptionEqualToValue={(opt, val) => opt.id === val.id}
           value={options.find((o) => o.id === value?.id || o.id === value) || null}
           onChange={(_, newVal) => onChange(config.name, newVal ? newVal.id : null)}
           renderInput={(params) => (
-            <TextField {...params} label={label} />
+            <TextField
+              {...params}
+              label={label}
+              slotProps={{
+                input: {
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loadingOptions && <CircularProgress size={20} />}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                },
+              }}
+            />
           )}
           sx={{ mb: 2 }}
         />
@@ -154,6 +167,7 @@ export default function FormField({
           options={options}
           loading={loadingOptions}
           getOptionLabel={(opt) => opt.label}
+          isOptionEqualToValue={(opt, val) => opt.id === val.id}
           value={options.filter((o) =>
             Array.isArray(value)
               ? value.some((v: { id: number } | number) =>
@@ -163,7 +177,21 @@ export default function FormField({
           )}
           onChange={(_, newVal) => onChange(config.name, newVal.map((v) => v.id))}
           renderInput={(params) => (
-            <TextField {...params} label={label} />
+            <TextField
+              {...params}
+              label={label}
+              slotProps={{
+                input: {
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loadingOptions && <CircularProgress size={20} />}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                },
+              }}
+            />
           )}
           sx={{ mb: 2 }}
         />
@@ -192,11 +220,9 @@ function inferType(name: string): FieldConfig["type"] {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractItems(data: any, path?: string): any[] {
   if (!path || path === "flat") {
-    // API may return [items[], count] or just items[]
     return Array.isArray(data) ? (Array.isArray(data[0]) ? data[0] : data) : [];
   }
 
-  // Nested path e.g. "roles" — flatten nested arrays from each module
   const parts = path.split(".");
   let items = Array.isArray(data) ? (Array.isArray(data[0]) ? data[0] : data) : [];
 
