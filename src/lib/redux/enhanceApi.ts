@@ -2,17 +2,13 @@ import { api } from "./api";
 
 import "./features/auth";
 import "./features/users";
-import "./features/roles";
 import "./features/groups";
-import "./features/modules";
 import "./features/clients";
 import "./features/contacts";
 
 const entities = [
   "users",
-  "roles",
   "groups",
-  "modules",
   "clients",
   "contacts",
 ];

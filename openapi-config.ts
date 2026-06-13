@@ -12,14 +12,8 @@ const config: ConfigFile = {
     './src/lib/redux/features/users.ts': {
       filterEndpoints: [/users/i],
     },
-    './src/lib/redux/features/roles.ts': {
-      filterEndpoints: [/roles/i],
-    },
     './src/lib/redux/features/groups.ts': {
       filterEndpoints: [/groups/i],
-    },
-    './src/lib/redux/features/modules.ts': {
-      filterEndpoints: [/modules/i],
     },
     './src/lib/redux/features/clients.ts': {
       filterEndpoints: [/clients/i],

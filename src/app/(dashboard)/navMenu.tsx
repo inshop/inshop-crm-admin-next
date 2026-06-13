@@ -6,7 +6,6 @@ import PeopleIcon from "@mui/icons-material/People";
 import SecurityIcon from "@mui/icons-material/Security";
 import GroupsIcon from "@mui/icons-material/Groups";
 import FaceIcon from "@mui/icons-material/Face";
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import NavMenuItem from "@/app/(dashboard)/navMenuItem";
 
 export interface MenuItemType {
@@ -35,11 +34,6 @@ const menuItems: MenuItemType[] = [
         name: "Groups",
         path: "/permissions/groups",
         icon: <GroupsIcon />,
-      },
-      {
-        name: "Modules",
-        path: "/permissions/modules",
-        icon: <ViewModuleIcon />,
       },
     ],
   },
