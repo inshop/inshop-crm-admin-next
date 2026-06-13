@@ -8,10 +8,18 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
+import RoleCheckboxesField from "@/components/RoleCheckboxesField";
 
 export interface FieldConfig {
   name: string;
-  type?: "text" | "password" | "textarea" | "boolean" | "select" | "multiselect";
+  type?:
+    | "text"
+    | "password"
+    | "textarea"
+    | "boolean"
+    | "select"
+    | "multiselect"
+    | "role-checkboxes";
   label?: string;
   options?: { id: number; label: string }[];
   optionsUrl?: string;
@@ -194,6 +202,17 @@ export default function FormField({
             />
           )}
           sx={{ mb: 2 }}
+        />
+      );
+
+    case "role-checkboxes":
+      return (
+        <RoleCheckboxesField
+          label={label}
+          modulesUrl={config.optionsUrl || "/api/admin/modules?take=100&skip=0"}
+          value={value}
+          onChange={(newVal) => onChange(config.name, newVal)}
+          enabled={enabled}
         />
       );
 

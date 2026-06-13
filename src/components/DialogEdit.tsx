@@ -17,6 +17,7 @@ interface DialogEditProps {
   fields: FieldConfig[];
   open: boolean;
   handleClose(): void;
+  onSuccess?(): void;
   id: number;
 }
 
@@ -25,6 +26,7 @@ export default function DialogEdit({
   fields,
   open,
   handleClose,
+  onSuccess,
   id,
 }: DialogEditProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,6 +53,7 @@ export default function DialogEdit({
           id={id}
           open={open}
           handleClose={handleClose}
+          onSuccess={onSuccess}
         />
       )}
     </CustomDialog>
@@ -65,9 +68,18 @@ interface EditFormProps {
   id: number;
   open: boolean;
   handleClose(): void;
+  onSuccess?(): void;
 }
 
-function EditForm({ api, entity, fields, id, open, handleClose }: EditFormProps) {
+function EditForm({
+  api,
+  entity,
+  fields,
+  id,
+  open,
+  handleClose,
+  onSuccess,
+}: EditFormProps) {
   const pluralEntity = pluralize(entity);
   const findOneKey = `use${capitalize(pluralEntity)}ControllerFindOneQuery`;
   const updateKey = `use${capitalize(pluralEntity)}ControllerUpdateMutation`;
@@ -106,6 +118,7 @@ function EditForm({ api, entity, fields, id, open, handleClose }: EditFormProps)
     try {
       const dtoKey = `update${capitalize(entity)}Dto`;
       await trigger({ id, [dtoKey]: formData }).unwrap();
+      onSuccess?.();
       handleClose();
     } catch (err: unknown) {
       const message =

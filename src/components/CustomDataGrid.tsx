@@ -115,6 +115,19 @@ function DataGridInner({
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const showSuccess = (action: "created" | "updated" | "deleted") => {
+    setDeleteError(null);
+    setSuccessMessage(`${capitalize(entity)} ${action} successfully`);
+  };
+
+  useEffect(() => {
+    if (!successMessage) return;
+
+    const timer = setTimeout(() => setSuccessMessage(null), 5000);
+    return () => clearTimeout(timer);
+  }, [successMessage]);
 
   const handleRowClick = (params: GridRowParams) => {
     if (canView && params.row.id) {
@@ -137,6 +150,7 @@ function DataGridInner({
     setDeleteError(null);
     try {
       await triggerDelete({ id: params.row.id }).unwrap();
+      showSuccess("deleted");
     } catch (err: unknown) {
       const message =
         err && typeof err === "object" && "data" in err
@@ -202,6 +216,16 @@ function DataGridInner({
 
   return (
     <>
+      {successMessage && (
+        <Alert
+          severity="success"
+          sx={{ mb: 2 }}
+          onClose={() => setSuccessMessage(null)}
+        >
+          {successMessage}
+        </Alert>
+      )}
+
       {(error || deleteError) && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {deleteError || "Failed to load data"}
@@ -267,6 +291,7 @@ function DataGridInner({
             fields={formFields}
             open={editOpen}
             handleClose={() => setEditOpen(false)}
+            onSuccess={() => showSuccess("updated")}
           />
         </>
       )}
@@ -276,6 +301,7 @@ function DataGridInner({
         fields={formFields}
         open={createOpen}
         handleClose={() => setCreateOpen(false)}
+        onSuccess={() => showSuccess("created")}
       />
     </>
   );

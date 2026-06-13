@@ -17,6 +17,7 @@ interface DialogCreateProps {
   fields: FieldConfig[];
   open: boolean;
   handleClose(): void;
+  onSuccess?(): void;
 }
 
 export default function DialogCreate({
@@ -24,6 +25,7 @@ export default function DialogCreate({
   fields,
   open,
   handleClose,
+  onSuccess,
 }: DialogCreateProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [api, setApi] = useState<any>(null);
@@ -48,6 +50,7 @@ export default function DialogCreate({
           fields={fields}
           open={open}
           handleClose={handleClose}
+          onSuccess={onSuccess}
         />
       )}
     </CustomDialog>
@@ -61,9 +64,17 @@ interface CreateFormProps {
   fields: FieldConfig[];
   open: boolean;
   handleClose(): void;
+  onSuccess?(): void;
 }
 
-function CreateForm({ api, entity, fields, open, handleClose }: CreateFormProps) {
+function CreateForm({
+  api,
+  entity,
+  fields,
+  open,
+  handleClose,
+  onSuccess,
+}: CreateFormProps) {
   const pluralEntity = pluralize(entity);
   const mutationKey = `use${capitalize(pluralEntity)}ControllerCreateMutation`;
 
@@ -87,6 +98,7 @@ function CreateForm({ api, entity, fields, open, handleClose }: CreateFormProps)
     try {
       const dtoKey = `create${capitalize(entity)}Dto`;
       await trigger({ [dtoKey]: formData }).unwrap();
+      onSuccess?.();
       handleClose();
     } catch (err: unknown) {
       const message =
