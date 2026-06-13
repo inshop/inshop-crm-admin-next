@@ -8,7 +8,8 @@ import ListItemText from "@mui/material/ListItemText";
 import { Collapse } from "@mui/material";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { MenuItemType } from "@/app/(dashboard)/navMenu";
+import { usePathname } from "next/navigation";
+import { hasActiveMenuChild, MenuItemType } from "@/app/(dashboard)/navMenu";
 import NavMenuItemPath from "@/app/(dashboard)/navMenuItemPath";
 
 interface MenuItemProps {
@@ -16,10 +17,16 @@ interface MenuItemProps {
 }
 
 export default function NavMenuItem({ menuItem }: MenuItemProps) {
-  const [open, setOpen] = React.useState(false);
+  const pathname = usePathname();
+  const childActive = hasActiveMenuChild(pathname, menuItem.children);
+  const [open, setOpen] = React.useState(childActive);
+
+  React.useEffect(() => {
+    setOpen(childActive);
+  }, [childActive]);
 
   const handleClick = () => {
-    setOpen(!open);
+    setOpen((prev) => !prev);
   };
 
   return (

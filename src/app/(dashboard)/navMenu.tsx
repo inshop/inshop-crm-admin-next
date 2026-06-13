@@ -15,6 +15,21 @@ export interface MenuItemType {
   children?: MenuItemType[];
 }
 
+export function isMenuPathActive(pathname: string, menuPath: string): boolean {
+  return pathname === menuPath || pathname.startsWith(`${menuPath}/`);
+}
+
+export function hasActiveMenuChild(
+  pathname: string,
+  children?: MenuItemType[],
+): boolean {
+  return (
+    children?.some(
+      (child) => child.path && isMenuPathActive(pathname, child.path),
+    ) ?? false
+  );
+}
+
 const menuItems: MenuItemType[] = [
   {
     name: "Clients",
