@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -8,23 +9,28 @@ import {
   GridRowParams,
   GridSortModel,
 } from "@mui/x-data-grid";
-import { useMemo, useState } from "react";
-import { Alert } from "@mui/material";
-import { UseQuery } from "@reduxjs/toolkit/src/query/react/buildHooks";
+import { Alert, Button, capitalize } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import Box from "@mui/material/Box";
+import pluralize from "pluralize";
 import DialogDetails from "@/components/DialogDetails";
 import DialogEdit from "@/components/DialogEdit";
+import DialogCreate from "@/components/DialogCreate";
+import { FieldConfig } from "@/components/FormField";
 
 interface CustomDataGridType {
-  query: UseQuery<unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: any;
   entity: string;
   columnsList: GridColDef[];
   columnsDetails: string[];
-  columnsEdit: string[];
+  formFields: FieldConfig[];
   canView?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  canCreate?: boolean;
 }
 
 const pageSizeOptions = [5, 10, 25, 50, 100];
@@ -34,19 +40,81 @@ export default function CustomDataGrid({
   entity,
   columnsList,
   columnsDetails,
-  columnsEdit,
+  formFields,
   canView = true,
   canEdit = true,
   canDelete = true,
+  canCreate = true,
 }: CustomDataGridType) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [api, setApi] = useState<any>(null);
+  const pluralEntity = pluralize(entity);
+
+  useEffect(() => {
+    (async () => {
+      setApi(await import("@/lib/redux/features/" + pluralEntity));
+    })();
+  }, [pluralEntity]);
+
+  return api ? (
+    <DataGridInner
+      query={query}
+      entity={entity}
+      pluralEntity={pluralEntity}
+      api={api}
+      columnsList={columnsList}
+      columnsDetails={columnsDetails}
+      formFields={formFields}
+      canView={canView}
+      canEdit={canEdit}
+      canDelete={canDelete}
+      canCreate={canCreate}
+    />
+  ) : null;
+}
+
+interface DataGridInnerProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: any;
+  entity: string;
+  pluralEntity: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  api: any;
+  columnsList: GridColDef[];
+  columnsDetails: string[];
+  formFields: FieldConfig[];
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canCreate: boolean;
+}
+
+function DataGridInner({
+  query,
+  entity,
+  pluralEntity,
+  api,
+  columnsList,
+  columnsDetails,
+  formFields,
+  canView,
+  canEdit,
+  canDelete,
+  canCreate,
+}: DataGridInnerProps) {
+  const removeKey = `use${capitalize(pluralEntity)}ControllerRemoveMutation`;
+  const [triggerDelete] = api[removeKey]();
+
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 5,
   });
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
-  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
-  const [editOpen, setEditOpen] = useState<boolean>(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleRowClick = (params: GridRowParams) => {
     if (canView && params.row.id) {
@@ -62,21 +130,27 @@ export default function CustomDataGrid({
     }
   };
 
-  const handleDelete = (params: GridRowParams) => {
-    if (
-      canDelete &&
-      params.row.id &&
-      confirm("Are you sure you want to delete this item?")
-    ) {
-      console.log("Delete row:", params.row);
+  const handleDelete = async (params: GridRowParams) => {
+    if (!canDelete || !params.row.id) return;
+    if (!confirm("Are you sure you want to delete this item?")) return;
+
+    setDeleteError(null);
+    try {
+      await triggerDelete({ id: params.row.id }).unwrap();
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === "object" && "data" in err
+          ? (err as { data: { message?: string } }).data?.message
+          : "Failed to delete";
+      setDeleteError(message || "Failed to delete");
     }
   };
 
   const _columns = useMemo(() => {
-    const _columns = [...columnsList];
+    const cols = [...columnsList];
 
     if (canEdit || canDelete) {
-      _columns.push({
+      cols.push({
         flex: 0.1,
         minWidth: 150,
         sortable: false,
@@ -114,7 +188,8 @@ export default function CustomDataGrid({
       });
     }
 
-    return _columns;
+    return cols;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columnsList, canEdit, canDelete]);
 
   const { data, error, isLoading } = query({
@@ -127,20 +202,31 @@ export default function CustomDataGrid({
 
   return (
     <>
-      {error && (
+      {(error || deleteError) && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {error.error || error.data.message}
+          {deleteError || "Failed to load data"}
         </Alert>
       )}
+
+      {canCreate && (
+        <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setCreateOpen(true)}
+          >
+            Create {capitalize(entity)}
+          </Button>
+        </Box>
+      )}
+
       <DataGrid
         rows={rows}
         rowCount={rowCount}
         columns={_columns}
         initialState={{
           pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
+            paginationModel: { pageSize: 5 },
           },
         }}
         pageSizeOptions={pageSizeOptions}
@@ -165,6 +251,7 @@ export default function CustomDataGrid({
           },
         }}
       />
+
       {selectedRow && (
         <>
           <DialogDetails
@@ -173,16 +260,23 @@ export default function CustomDataGrid({
             columns={columnsDetails}
             open={detailsOpen}
             handleClose={() => setDetailsOpen(false)}
-          ></DialogDetails>
+          />
           <DialogEdit
             id={selectedRow}
             entity={entity}
-            columns={columnsEdit}
+            fields={formFields}
             open={editOpen}
             handleClose={() => setEditOpen(false)}
-          ></DialogEdit>
+          />
         </>
       )}
+
+      <DialogCreate
+        entity={entity}
+        fields={formFields}
+        open={createOpen}
+        handleClose={() => setCreateOpen(false)}
+      />
     </>
   );
 }

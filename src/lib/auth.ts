@@ -1,23 +1,22 @@
 import { NextResponse } from "next/server";
 
-export type TokenType = {
-  exp: number;
-};
-
-export function parseToken(token: string): TokenType | undefined {
-  const parts = token.split(".");
-
-  if (parts.length !== 3) {
+export function parseToken(token: string): Record<string, unknown> | undefined {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) {
+      return undefined;
+    }
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(Buffer.from(base64, "base64").toString());
+  } catch {
     return undefined;
   }
-
-  return JSON.parse(Buffer.from(parts[1], "base64").toString());
 }
 
 export function getTokenExpiration(token: string): number | undefined {
   const payload = parseToken(token);
 
-  if (payload && payload.exp) {
+  if (payload && typeof payload.exp === "number") {
     return Math.floor((payload.exp * 1000 - Date.now()) / 1000);
   }
 }

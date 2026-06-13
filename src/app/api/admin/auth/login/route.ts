@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { setCookie } from "@/lib/auth";
+import { setCookie, parseToken } from "@/lib/auth";
 
 const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL;
 
@@ -45,7 +45,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const res = NextResponse.json({ success: true });
+    const parsed = parseToken(token);
+
+    const res = NextResponse.json({
+      success: true,
+      user: {
+        id: parsed?.id,
+        name: parsed?.name,
+        email: parsed?.email,
+        roles: parsed?.roles,
+      },
+    });
 
     setCookie(res, "token", token);
     setCookie(res, "refreshToken", refreshToken);

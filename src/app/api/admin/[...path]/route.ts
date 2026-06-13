@@ -17,21 +17,30 @@ async function attemptRefresh(refreshToken: string): Promise<{ token: string; re
     if (res.ok) {
       return await res.json();
     }
-  } catch (err) {}
+  } catch {
+    // refresh failed
+  }
 
   return null;
 }
 
-async function handle(req: NextRequest, params?: { path?: string[] }) {
+async function handle(req: NextRequest) {
   try {
     const incomingUrl = new URL(req.url);
     const backendUrl = `${BACKEND_BASE_URL.replace(/\/$/, "")}${incomingUrl.pathname}${incomingUrl.search}`;
     const cookieStore = await cookies();
 
-    const token = cookieStore.get("token")?.value || undefined;
+    const token = cookieStore.get("token")?.value;
     const headers: Record<string, string> = {};
 
-    headers["Authorization"] = `Bearer ${token}`;
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const contentType = req.headers.get("content-type");
+    if (contentType) {
+      headers["Content-Type"] = contentType;
+    }
 
     let body: BodyInit | undefined = undefined;
     const method = req.method.toUpperCase();
@@ -46,10 +55,10 @@ async function handle(req: NextRequest, params?: { path?: string[] }) {
     const backendRes = await fetch(backendUrl, {method, headers, body});
 
     if (backendRes.status === 401) {
-      const refreshToken = cookieStore.get("refreshToken")?.value || undefined;
+      const refreshToken = cookieStore.get("refreshToken")?.value;
 
       if (!refreshToken) {
-        return NextResponse.json({message: "Can't refresh token"}, {status: 502});
+        return NextResponse.json({message: "Unauthorized"}, {status: 401});
       }
 
       const refreshed = await attemptRefresh(refreshToken);
@@ -57,9 +66,12 @@ async function handle(req: NextRequest, params?: { path?: string[] }) {
       if (refreshed && refreshed.token && refreshed.refreshToken) {
         headers["Authorization"] = `Bearer ${refreshed.token}`;
 
-        const backendRes = await fetch(backendUrl, {method, headers, body});
-        const resBody = await backendRes.arrayBuffer();
-        const response = new NextResponse(resBody, {status: backendRes.status});
+        const retryRes = await fetch(backendUrl, {method, headers, body});
+        const resBody = await retryRes.arrayBuffer();
+        const response = new NextResponse(resBody, {
+          status: retryRes.status,
+          headers: {"Content-Type": retryRes.headers.get("Content-Type") || "application/json"},
+        });
 
         setCookie(response, "token", refreshed.token);
         setCookie(response, "refreshToken", refreshed.refreshToken);
@@ -72,32 +84,35 @@ async function handle(req: NextRequest, params?: { path?: string[] }) {
 
     const resBody = await backendRes.arrayBuffer();
 
-    return new NextResponse(resBody, {status: backendRes.status});
-  } catch (err) {
+    return new NextResponse(resBody, {
+      status: backendRes.status,
+      headers: {"Content-Type": backendRes.headers.get("Content-Type") || "application/json"},
+    });
+  } catch {
     return NextResponse.json({message: "Backend fetch error"}, {status: 502});
   }
 }
 
-export async function GET(req: NextRequest, context: { params: { path: string[] } }) {
-  return handle(req, context.params);
+export async function GET(req: NextRequest) {
+  return handle(req);
 }
 
-export async function POST(req: NextRequest, context: { params: { path: string[] } }) {
-  return handle(req, context.params);
+export async function POST(req: NextRequest) {
+  return handle(req);
 }
 
-export async function PUT(req: NextRequest, context: { params: { path: string[] } }) {
-  return handle(req, context.params);
+export async function PUT(req: NextRequest) {
+  return handle(req);
 }
 
-export async function PATCH(req: NextRequest, context: { params: { path: string[] } }) {
-  return handle(req, context.params);
+export async function PATCH(req: NextRequest) {
+  return handle(req);
 }
 
-export async function DELETE(req: NextRequest, context: { params: { path: string[] } }) {
-  return handle(req, context.params);
+export async function DELETE(req: NextRequest) {
+  return handle(req);
 }
 
-export async function OPTIONS(req: NextRequest, context: { params: { path: string[] } }) {
-  return handle(req, context.params);
+export async function OPTIONS(req: NextRequest) {
+  return handle(req);
 }

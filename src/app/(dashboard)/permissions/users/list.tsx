@@ -5,7 +5,7 @@ import PageList from "@/components/PageList";
 import {
   columnsList,
   columnsDetails,
-  columnsEdit,
+  formFields,
 } from "@/app/(dashboard)/permissions/users/columns";
 
 interface ListType {
@@ -20,7 +20,7 @@ export default function List({ title, entity }: ListType) {
       entity={entity}
       columnsList={columnsList}
       columnsDetails={columnsDetails}
-      columnsEdit={columnsEdit}
-    ></PageList>
+      formFields={formFields}
+    />
   );
 }

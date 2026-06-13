@@ -4,7 +4,7 @@ import PageList from "@/components/PageList";
 import {
   columnsList,
   columnsDetails,
-  columnsEdit,
+  formFields,
 } from "@/app/(dashboard)/permissions/groups/columns";
 
 const title = "Groups";
@@ -22,7 +22,7 @@ export default function Page() {
       entity={entity}
       columnsList={columnsList}
       columnsDetails={columnsDetails}
-      columnsEdit={columnsEdit}
-    ></PageList>
+      formFields={formFields}
+    />
   );
 }

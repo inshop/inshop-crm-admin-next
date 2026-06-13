@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Alert, capitalize, CircularProgress } from "@mui/material";
-import { UseQuery } from "@reduxjs/toolkit/src/query/react/buildHooks";
+import { capitalize, CircularProgress, Alert } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -12,7 +11,8 @@ import TableCell from "@mui/material/TableCell";
 import Box from "@mui/material/Box";
 
 interface CustomTableDataType {
-  query: UseQuery<unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  query: any;
   columns: string[];
   id: number;
   canView?: boolean;
@@ -38,7 +38,7 @@ export default function CustomTableData({
     <>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {error.error || error.data.message}
+          {error?.error || error?.data?.message || "Failed to load data"}
         </Alert>
       )}
       {isLoading && (

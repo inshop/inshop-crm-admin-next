@@ -1,4 +1,5 @@
 import { GridColDef } from "@mui/x-data-grid";
+import { FieldConfig } from "@/components/FormField";
 
 export const columnsList: GridColDef[] = [
   {
@@ -14,7 +15,6 @@ export const columnsList: GridColDef[] = [
     headerName: "Name",
     flex: 0.4,
     minWidth: 200,
-    editable: true,
     sortable: false,
     disableColumnMenu: true,
   },
@@ -23,7 +23,6 @@ export const columnsList: GridColDef[] = [
     headerName: "email",
     flex: 0.4,
     minWidth: 200,
-    editable: true,
     sortable: false,
     disableColumnMenu: true,
   },
@@ -32,7 +31,6 @@ export const columnsList: GridColDef[] = [
     headerName: "Group",
     flex: 0.4,
     minWidth: 200,
-    editable: true,
     sortable: false,
     disableColumnMenu: true,
     renderCell: (params) => {
@@ -45,7 +43,6 @@ export const columnsList: GridColDef[] = [
     type: "boolean",
     flex: 0.1,
     minWidth: 100,
-    editable: true,
     sortable: false,
     disableColumnMenu: true,
   },
@@ -53,4 +50,15 @@ export const columnsList: GridColDef[] = [
 
 export const columnsDetails = ["id", "name", "email", "isActive"];
 
-export const columnsEdit = ["id", "name", "email", "isActive"];
+export const formFields: FieldConfig[] = [
+  { name: "name" },
+  { name: "email" },
+  { name: "password", type: "password" },
+  {
+    name: "group",
+    type: "select",
+    label: "Group",
+    optionsUrl: "/api/admin/groups?take=100&skip=0",
+  },
+  { name: "isActive", type: "boolean" },
+];

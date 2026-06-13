@@ -7,13 +7,15 @@ import { GridColDef } from "@mui/x-data-grid";
 import { capitalize } from "@mui/material";
 import pluralize from "pluralize";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/providers/AuthProvider";
+import { FieldConfig } from "@/components/FormField";
 
 interface PageListType {
   title: string;
   entity: string;
   columnsList: GridColDef[];
   columnsDetails: string[];
-  columnsEdit: string[];
+  formFields: FieldConfig[];
 }
 
 export default function PageList({
@@ -21,10 +23,12 @@ export default function PageList({
   entity,
   columnsList,
   columnsDetails,
-  columnsEdit,
+  formFields,
 }: PageListType) {
-  const [api, setApi] = useState(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [api, setApi] = useState<any>(null);
   const key = `use${capitalize(pluralize(entity))}ControllerFindAllQuery`;
+  const { canCreate, canUpdate, canDetails, canDelete } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -43,8 +47,12 @@ export default function PageList({
             query={api[key]}
             columnsList={columnsList}
             columnsDetails={columnsDetails}
-            columnsEdit={columnsEdit}
-          ></CustomDataGrid>
+            formFields={formFields}
+            canView={canDetails(entity)}
+            canEdit={canUpdate(entity)}
+            canDelete={canDelete(entity)}
+            canCreate={canCreate(entity)}
+          />
         )}
       </Box>
     </>

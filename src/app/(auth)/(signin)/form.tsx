@@ -59,7 +59,12 @@ export default function Form() {
 
     try {
       setIsSubmitting(true);
-      await login({ loginAuthDto: { email, password } }).unwrap();
+      const result = (await login({ loginAuthDto: { email, password } }).unwrap()) as {
+        user?: { id: number; name: string; email: string; roles: string[] };
+      };
+      if (result?.user) {
+        localStorage.setItem("auth_user", JSON.stringify(result.user));
+      }
       router.replace("/clients");
     } catch (e: unknown) {
       setSubmitError(

@@ -11,21 +11,22 @@ import { Suspense } from "react";
 import Loading from "@/app/(dashboard)/loading";
 import NavMenu from "./navMenu";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/material/MenuItem";
+import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Divider } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers/AuthProvider";
 
 const drawerWidth = 240;
 
 export default function DashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [auth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const router = useRouter();
+  const { user } = useAuth();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -42,10 +43,10 @@ export default function DashboardLayout({
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
-    } catch (_e) {
+    } catch {
       // Ignore errors, proceed with redirect
     }
-    // Redirect to sign-in page
+    localStorage.removeItem("auth_user");
     router.replace("/");
   };
 
@@ -69,43 +70,39 @@ export default function DashboardLayout({
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Inshop CRM
           </Typography>
-          {auth && (
-            <div>
-              <Typography component="span" sx={{ mr: 2 }}>
-                Firstname Surname (admin)
-              </Typography>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleMenu}
-                color="inherit"
-              >
-                <AccountCircleIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose}>Dashboard</MenuItem>
-                <MenuItem onClick={handleClose}>Reset password</MenuItem>
-                <Divider />
-                <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
-              </Menu>
-            </div>
-          )}
+          <Typography component="span" sx={{ mr: 2 }}>
+            {user ? `${user.name} (${user.email})` : "Account"}
+          </Typography>
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+            color="inherit"
+          >
+            <AccountCircleIcon />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleClose}>Dashboard</MenuItem>
+            <MenuItem onClick={handleClose}>Reset password</MenuItem>
+            <Divider />
+            <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -121,7 +118,7 @@ export default function DashboardLayout({
       >
         <Toolbar />
         <Box sx={{ overflow: "auto" }}>
-          <NavMenu></NavMenu>
+          <NavMenu />
         </Box>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
