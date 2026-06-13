@@ -5,12 +5,14 @@ import DialogContent from "@mui/material/DialogContent";
 import Grid from "@mui/material/Grid";
 import CloseIcon from "@mui/icons-material/Close";
 import { ReactNode } from "react";
+import type { Breakpoint } from "@mui/material/styles";
 
 interface DialogDetailsProps {
   open: boolean;
   handleClose(): void;
   children: ReactNode;
   fullScreen?: boolean;
+  maxWidth?: Breakpoint | false;
 }
 
 const CustomDialog = ({
@@ -18,13 +20,14 @@ const CustomDialog = ({
   handleClose,
   children,
   fullScreen = false,
+  maxWidth = "md",
 }: DialogDetailsProps) => {
   return (
     <Dialog
       onClose={handleClose}
       open={open}
       fullScreen={fullScreen}
-      maxWidth={fullScreen ? false : "md"}
+      maxWidth={fullScreen ? false : maxWidth}
       fullWidth={!fullScreen}
     >
       <DialogTitle sx={{ m: 0, p: fullScreen ? undefined : 1 }}>

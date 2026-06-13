@@ -37,8 +37,14 @@ export default function DialogCreate({
     })();
   }, [pluralEntity]);
 
+  const dialogMaxWidth = entity === "group" ? "lg" : undefined;
+
   return (
-    <CustomDialog open={open} handleClose={handleClose}>
+    <CustomDialog
+      open={open}
+      handleClose={handleClose}
+      maxWidth={dialogMaxWidth}
+    >
       <Typography variant="h6" sx={{ mb: 2, pr: 4 }}>
         Create {capitalize(entity)}
       </Typography>

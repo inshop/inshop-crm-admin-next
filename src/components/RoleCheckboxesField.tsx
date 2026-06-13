@@ -101,7 +101,7 @@ export default function RoleCheckboxesField({
       ) : (
         <Box
           sx={{
-            maxHeight: 360,
+            maxHeight: 480,
             overflowY: "auto",
             border: 1,
             borderColor: "divider",
@@ -109,38 +109,70 @@ export default function RoleCheckboxesField({
             p: 1.5,
           }}
         >
-          {modules.map((mod) => (
-            <Box key={mod.id} sx={{ mb: 2, "&:last-child": { mb: 0 } }}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: "block", mb: 0.5, textTransform: "capitalize" }}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+              },
+              gap: 1.5,
+            }}
+          >
+            {modules.map((mod) => (
+              <Box
+                key={mod.id}
+                sx={{
+                  border: 1,
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  p: 1.25,
+                  bgcolor: "background.default",
+                }}
               >
-                {mod.name}
-              </Typography>
-
-              {mod.roles.length === 0 ? (
-                <Typography variant="body2" color="text.disabled" sx={{ pl: 1 }}>
-                  No roles
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    display: "block",
+                    mb: 0.75,
+                    fontWeight: 600,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {mod.name}
                 </Typography>
-              ) : (
-                mod.roles.map((role) => (
-                  <FormControlLabel
-                    key={role.id}
-                    sx={{ display: "flex", ml: 0 }}
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={selectedIds.includes(role.id)}
-                        onChange={(e) => handleToggle(role.id, e.target.checked)}
-                      />
-                    }
-                    label={formatRoleLabel(role.name)}
-                  />
-                ))
-              )}
-            </Box>
-          ))}
+
+                {mod.roles.length === 0 ? (
+                  <Typography variant="body2" color="text.disabled">
+                    No roles
+                  </Typography>
+                ) : (
+                  mod.roles.map((role) => (
+                    <FormControlLabel
+                      key={role.id}
+                      sx={{ display: "flex", ml: 0, mr: 0 }}
+                      control={
+                        <Checkbox
+                          size="small"
+                          checked={selectedIds.includes(role.id)}
+                          onChange={(e) =>
+                            handleToggle(role.id, e.target.checked)
+                          }
+                        />
+                      }
+                      label={
+                        <Typography variant="body2" noWrap>
+                          {formatRoleLabel(role.name)}
+                        </Typography>
+                      }
+                    />
+                  ))
+                )}
+              </Box>
+            ))}
+          </Box>
         </Box>
       )}
     </Box>

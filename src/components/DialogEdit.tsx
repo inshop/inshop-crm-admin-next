@@ -39,8 +39,14 @@ export default function DialogEdit({
     })();
   }, [pluralEntity]);
 
+  const dialogMaxWidth = entity === "group" ? "lg" : undefined;
+
   return (
-    <CustomDialog open={open} handleClose={handleClose}>
+    <CustomDialog
+      open={open}
+      handleClose={handleClose}
+      maxWidth={dialogMaxWidth}
+    >
       <Typography variant="h6" sx={{ mb: 2, pr: 4 }}>
         Edit {capitalize(entity)}
       </Typography>
