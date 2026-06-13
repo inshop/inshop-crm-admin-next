@@ -103,7 +103,13 @@ function CreateForm({
 
     try {
       const dtoKey = `create${capitalize(entity)}Dto`;
-      await trigger({ [dtoKey]: formData }).unwrap();
+      const payload = { ...formData };
+      for (const field of fields) {
+        if (field.type === "boolean") {
+          payload[field.name] = payload[field.name] === true;
+        }
+      }
+      await trigger({ [dtoKey]: payload }).unwrap();
       onSuccess?.();
       handleClose();
     } catch (err: unknown) {

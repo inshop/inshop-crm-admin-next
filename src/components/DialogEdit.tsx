@@ -110,7 +110,10 @@ function EditForm({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const initial: Record<string, any> = {};
       for (const field of fields) {
-        initial[field.name] = data[field.name] ?? "";
+        initial[field.name] =
+          field.type === "boolean"
+            ? (data[field.name] ?? false)
+            : (data[field.name] ?? "");
       }
       setFormData(initial);
       setInitialized(true);

@@ -6,10 +6,11 @@ import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
+  GridRenderCellParams,
   GridRowParams,
   GridSortModel,
 } from "@mui/x-data-grid";
-import { Alert, Button, capitalize } from "@mui/material";
+import { Alert, Button, capitalize, Chip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -160,8 +161,24 @@ function DataGridInner({
     }
   };
 
-  const _columns = useMemo(() => {
-    const cols = [...columnsList];
+  const _columns = useMemo((): GridColDef[] => {
+    const cols: GridColDef[] = columnsList.map((col) =>
+      col.type === "boolean"
+        ? ({
+            ...col,
+            align: "center",
+            headerAlign: "center",
+            renderCell: (params: GridRenderCellParams) => (
+              <Chip
+                size="small"
+                label={params.value ? "Yes" : "No"}
+                color={params.value ? "success" : "error"}
+                variant="filled"
+              />
+            ),
+          } as GridColDef)
+        : col,
+    );
 
     if (canEdit || canDelete) {
       cols.push({
