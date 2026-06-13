@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import "@/lib/redux/enhanceApi";
 import { api } from "@/lib/redux/api";
 // import {setupListeners} from "@reduxjs/toolkit/query";
 
