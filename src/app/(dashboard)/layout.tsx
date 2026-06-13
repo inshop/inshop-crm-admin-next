@@ -15,7 +15,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { Divider } from "@mui/material";
+import { Divider, useMediaQuery, useTheme } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 
@@ -24,9 +24,29 @@ const drawerWidth = 240;
 export default function DashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
+  const [drawerOpen, setDrawerOpen] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const router = useRouter();
   const { user } = useAuth();
+
+  React.useEffect(() => {
+    if (isMobile) {
+      setDrawerOpen(false);
+    }
+  }, [isMobile]);
+
+  const drawerTransition = theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  });
+
+  const showDrawer = !isMobile && drawerOpen;
+
+  const handleDrawerToggle = () => {
+    setDrawerOpen((open) => !open);
+  };
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -63,6 +83,7 @@ export default function DashboardLayout({
             edge="start"
             color="inherit"
             aria-label="menu"
+            onClick={handleDrawerToggle}
             sx={{ mr: 2 }}
           >
             <MenuIcon />
@@ -106,10 +127,14 @@ export default function DashboardLayout({
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="permanent"
+        variant={isMobile ? "temporary" : "persistent"}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        ModalProps={{ keepMounted: true }}
         sx={{
-          width: drawerWidth,
+          width: showDrawer ? drawerWidth : 0,
           flexShrink: 0,
+          transition: drawerTransition,
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: "border-box",
