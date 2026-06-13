@@ -24,6 +24,17 @@ async function attemptRefresh(refreshToken: string): Promise<{ token: string; re
   return null;
 }
 
+function proxyResponse(status: number, body: ArrayBuffer, contentType: string | null) {
+  if (status === 204 || status === 205 || status === 304) {
+    return new NextResponse(null, { status });
+  }
+
+  return new NextResponse(body, {
+    status,
+    headers: { "Content-Type": contentType || "application/json" },
+  });
+}
+
 async function handle(req: NextRequest) {
   try {
     const incomingUrl = new URL(req.url);
@@ -68,10 +79,11 @@ async function handle(req: NextRequest) {
 
         const retryRes = await fetch(backendUrl, {method, headers, body});
         const resBody = await retryRes.arrayBuffer();
-        const response = new NextResponse(resBody, {
-          status: retryRes.status,
-          headers: {"Content-Type": retryRes.headers.get("Content-Type") || "application/json"},
-        });
+        const response = proxyResponse(
+          retryRes.status,
+          resBody,
+          retryRes.headers.get("Content-Type"),
+        );
 
         setCookie(response, "token", refreshed.token);
         setCookie(response, "refreshToken", refreshed.refreshToken);
@@ -84,10 +96,11 @@ async function handle(req: NextRequest) {
 
     const resBody = await backendRes.arrayBuffer();
 
-    return new NextResponse(resBody, {
-      status: backendRes.status,
-      headers: {"Content-Type": backendRes.headers.get("Content-Type") || "application/json"},
-    });
+    return proxyResponse(
+      backendRes.status,
+      resBody,
+      backendRes.headers.get("Content-Type"),
+    );
   } catch {
     return NextResponse.json({message: "Backend fetch error"}, {status: 502});
   }

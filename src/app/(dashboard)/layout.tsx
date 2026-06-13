@@ -18,6 +18,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { Divider, useMediaQuery, useTheme } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
+import ChangePasswordDialog from "@/components/ChangePasswordDialog";
 
 const drawerWidth = 240;
 
@@ -28,6 +29,7 @@ export default function DashboardLayout({
   const isMobile = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
   const [drawerOpen, setDrawerOpen] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [changePasswordOpen, setChangePasswordOpen] = React.useState(false);
   const router = useRouter();
   const { user } = useAuth();
 
@@ -120,7 +122,14 @@ export default function DashboardLayout({
             onClose={handleClose}
           >
             <MenuItem onClick={handleClose}>Dashboard</MenuItem>
-            <MenuItem onClick={handleClose}>Reset password</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                setChangePasswordOpen(true);
+              }}
+            >
+              Change password
+            </MenuItem>
             <Divider />
             <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
           </Menu>
@@ -150,6 +159,10 @@ export default function DashboardLayout({
         <Toolbar />
         <Suspense fallback={<Loading />}>{children}</Suspense>
       </Box>
+      <ChangePasswordDialog
+        open={changePasswordOpen}
+        onClose={() => setChangePasswordOpen(false)}
+      />
     </Box>
   );
 }
