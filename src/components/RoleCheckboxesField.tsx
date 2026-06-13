@@ -88,6 +88,13 @@ export default function RoleCheckboxesField({
     onChange(nextIds.map((id) => ({ id })));
   };
 
+  const handleModuleToggle = (roleIds: number[], checked: boolean) => {
+    const nextIds = checked
+      ? [...new Set([...selectedIds, ...roleIds])]
+      : selectedIds.filter((id) => !roleIds.includes(id));
+    onChange(nextIds.map((id) => ({ id })));
+  };
+
   return (
     <Box sx={{ mb: 2 }}>
       <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -120,7 +127,18 @@ export default function RoleCheckboxesField({
               gap: 1.5,
             }}
           >
-            {modules.map((mod) => (
+            {modules.map((mod) => {
+              const moduleRoleIds = mod.roles.map((role) => role.id);
+              const selectedInModule = moduleRoleIds.filter((id) =>
+                selectedIds.includes(id),
+              );
+              const allSelected =
+                moduleRoleIds.length > 0 &&
+                selectedInModule.length === moduleRoleIds.length;
+              const someSelected =
+                selectedInModule.length > 0 && !allSelected;
+
+              return (
               <Box
                 key={mod.id}
                 sx={{
@@ -131,18 +149,29 @@ export default function RoleCheckboxesField({
                   bgcolor: "background.default",
                 }}
               >
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{
-                    display: "block",
-                    mb: 0.75,
-                    fontWeight: 600,
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {mod.name}
-                </Typography>
+                <FormControlLabel
+                  sx={{ display: "flex", ml: 0, mr: 0, mb: 0.75 }}
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={allSelected}
+                      indeterminate={someSelected}
+                      disabled={mod.roles.length === 0}
+                      onChange={(e) =>
+                        handleModuleToggle(moduleRoleIds, e.target.checked)
+                      }
+                    />
+                  }
+                  label={
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600, textTransform: "capitalize" }}
+                    >
+                      {mod.name}
+                    </Typography>
+                  }
+                />
 
                 {mod.roles.length === 0 ? (
                   <Typography variant="body2" color="text.disabled">
@@ -171,7 +200,8 @@ export default function RoleCheckboxesField({
                   ))
                 )}
               </Box>
-            ))}
+              );
+            })}
           </Box>
         </Box>
       )}
