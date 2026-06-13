@@ -10,12 +10,24 @@ interface DialogDetailsProps {
   open: boolean;
   handleClose(): void;
   children: ReactNode;
+  fullScreen?: boolean;
 }
 
-const CustomDialog = ({ open, handleClose, children }: DialogDetailsProps) => {
+const CustomDialog = ({
+  open,
+  handleClose,
+  children,
+  fullScreen = false,
+}: DialogDetailsProps) => {
   return (
-    <Dialog onClose={handleClose} open={open} fullScreen>
-      <DialogTitle id="full-screen-dialog-title">
+    <Dialog
+      onClose={handleClose}
+      open={open}
+      fullScreen={fullScreen}
+      maxWidth={fullScreen ? false : "md"}
+      fullWidth={!fullScreen}
+    >
+      <DialogTitle sx={{ m: 0, p: fullScreen ? undefined : 1 }}>
         <IconButton
           aria-label="close"
           onClick={handleClose}
@@ -24,10 +36,14 @@ const CustomDialog = ({ open, handleClose, children }: DialogDetailsProps) => {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
-        <Grid container spacing={6}>
-          <Grid>{children}</Grid>
-        </Grid>
+      <DialogContent sx={fullScreen ? undefined : { pt: 1 }}>
+        {fullScreen ? (
+          <Grid container spacing={6}>
+            <Grid>{children}</Grid>
+          </Grid>
+        ) : (
+          children
+        )}
       </DialogContent>
     </Dialog>
   );

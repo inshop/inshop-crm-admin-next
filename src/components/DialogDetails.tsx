@@ -33,7 +33,7 @@ const DialogDetails = ({
   }, [entity]);
 
   return (
-    <CustomDialog open={open} handleClose={handleClose}>
+    <CustomDialog open={open} handleClose={handleClose} fullScreen>
       <Typography variant="h4" sx={{ mb: 4 }}>
         {capitalize(entity)} Details
       </Typography>

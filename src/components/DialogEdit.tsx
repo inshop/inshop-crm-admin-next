@@ -39,7 +39,7 @@ export default function DialogEdit({
 
   return (
     <CustomDialog open={open} handleClose={handleClose}>
-      <Typography variant="h4" sx={{ mb: 4 }}>
+      <Typography variant="h6" sx={{ mb: 2, pr: 4 }}>
         Edit {capitalize(entity)}
       </Typography>
 
