@@ -5,10 +5,8 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthControllerLoginMutation } from "@/lib/redux/features/auth";
 
@@ -145,15 +143,6 @@ export default function Form() {
         >
           {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
-        <Link
-          href="/reset-password"
-          component={NextLink}
-          type="button"
-          variant="body2"
-          sx={{ alignSelf: "center" }}
-        >
-          Forgot your password?
-        </Link>
       </Box>
     </>
   );
