@@ -131,6 +131,7 @@ function CreateForm({
       <Box
         component="form"
         onSubmit={handleSubmit}
+        autoComplete="off"
         sx={{ width: "100%", mt: 2 }}
       >
         {fields.map((field) => (

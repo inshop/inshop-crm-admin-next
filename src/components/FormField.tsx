@@ -26,6 +26,7 @@ export interface FieldConfig {
   /** Path format: "items.roles" to extract nested arrays, or "flat" (default) for top-level array */
   optionsPath?: string;
   optionLabelKey?: string;
+  autoComplete?: string;
 }
 
 interface FormFieldProps {
@@ -134,6 +135,7 @@ export default function FormField({
           value={value || ""}
           onChange={(e) => onChange(config.name, e.target.value)}
           type="password"
+          autoComplete={config.autoComplete ?? "new-password"}
           sx={{ mb: 2 }}
         />
       );
@@ -223,6 +225,7 @@ export default function FormField({
           label={label}
           value={value || ""}
           onChange={(e) => onChange(config.name, e.target.value)}
+          autoComplete={config.autoComplete}
           sx={{ mb: 2 }}
         />
       );

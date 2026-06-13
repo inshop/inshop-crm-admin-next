@@ -41,7 +41,7 @@ export const columnsDetails = ["id", "name", "email", "isActive"];
 
 export const formFields: FieldConfig[] = [
   { name: "name" },
-  { name: "email" },
+  { name: "email", autoComplete: "off" },
   { name: "password", type: "password" },
   { name: "isActive", type: "boolean" },
 ];
