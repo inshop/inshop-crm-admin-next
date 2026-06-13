@@ -33,7 +33,7 @@ interface CustomDataGridType {
   canCreate?: boolean;
 }
 
-const pageSizeOptions = [5, 10, 25, 50, 100];
+const pageSizeOptions = [25, 50, 100];
 
 export default function CustomDataGrid({
   query,
@@ -107,7 +107,7 @@ function DataGridInner({
 
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 5,
+    pageSize: 25,
   });
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -250,7 +250,7 @@ function DataGridInner({
         columns={_columns}
         initialState={{
           pagination: {
-            paginationModel: { pageSize: 5 },
+            paginationModel: { pageSize: 25 },
           },
         }}
         pageSizeOptions={pageSizeOptions}
