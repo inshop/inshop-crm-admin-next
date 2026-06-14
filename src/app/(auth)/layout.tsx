@@ -50,7 +50,7 @@ export default function AuthLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <AuthContainer direction="column" justifyContent="space-between">
+    <AuthContainer direction="column" sx={{ justifyContent: "space-between" }}>
       <Card variant="outlined">{children}</Card>
     </AuthContainer>
   );

@@ -10,6 +10,11 @@ export default defineConfig({
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["e2e/**", "node_modules/**"],
     globals: true,
+    server: {
+      deps: {
+        inline: [/@mui\/.*/, "react-transition-group"],
+      },
+    },
   },
   resolve: {
     alias: {

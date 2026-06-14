@@ -151,19 +151,25 @@ export default function FormField({
           onChange={(_, newVal) => onChange(config.name, newVal ? newVal.id : null)}
           renderInput={(params) => (
             <TextField
-              {...params}
               label={label}
+              id={params.id}
+              disabled={params.disabled}
+              fullWidth={params.fullWidth}
+              size={params.size}
               slotProps={{
+                inputLabel: params.slotProps.inputLabel,
+                htmlInput: params.slotProps.htmlInput,
                 input: {
-                  ...params.InputProps,
+                  ...params.slotProps.input,
                   endAdornment: (
                     <>
                       {loadingOptions && <CircularProgress size={20} />}
-                      {params.InputProps.endAdornment}
+                      {params.slotProps.input.endAdornment}
                     </>
                   ),
                 },
               }}
+              sx={{ mb: 2 }}
             />
           )}
           sx={{ mb: 2 }}
@@ -188,19 +194,25 @@ export default function FormField({
           onChange={(_, newVal) => onChange(config.name, newVal.map((v) => v.id))}
           renderInput={(params) => (
             <TextField
-              {...params}
               label={label}
+              id={params.id}
+              disabled={params.disabled}
+              fullWidth={params.fullWidth}
+              size={params.size}
               slotProps={{
+                inputLabel: params.slotProps.inputLabel,
+                htmlInput: params.slotProps.htmlInput,
                 input: {
-                  ...params.InputProps,
+                  ...params.slotProps.input,
                   endAdornment: (
                     <>
                       {loadingOptions && <CircularProgress size={20} />}
-                      {params.InputProps.endAdornment}
+                      {params.slotProps.input.endAdornment}
                     </>
                   ),
                 },
               }}
+              sx={{ mb: 2 }}
             />
           )}
           sx={{ mb: 2 }}
