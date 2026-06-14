@@ -39,11 +39,6 @@ export default function DashboardLayout({
     }
   }, [isMobile]);
 
-  const drawerTransition = theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  });
-
   const showDrawer = !isMobile && drawerOpen;
 
   const handleDrawerToggle = () => {
@@ -140,9 +135,8 @@ export default function DashboardLayout({
         onClose={() => setDrawerOpen(false)}
         ModalProps={{ keepMounted: true }}
         sx={{
-          width: showDrawer ? drawerWidth : 0,
+          width: isMobile ? undefined : drawerWidth,
           flexShrink: 0,
-          transition: drawerTransition,
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: "border-box",
@@ -154,7 +148,19 @@ export default function DashboardLayout({
           <NavMenu />
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          minWidth: 0,
+          p: 3,
+          ...(isMobile
+            ? {}
+            : {
+                ml: showDrawer ? 0 : `-${drawerWidth}px`,
+              }),
+        }}
+      >
         <Toolbar />
         <Suspense fallback={<Loading />}>{children}</Suspense>
       </Box>
