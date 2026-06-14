@@ -10,7 +10,8 @@ import {
   GridRowParams,
   GridSortModel,
 } from "@mui/x-data-grid";
-import { Alert, Button, capitalize, Chip } from "@mui/material";
+import { Alert, Button, capitalize } from "@mui/material";
+import { BooleanChip } from "@/components/BooleanChip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -169,12 +170,7 @@ function DataGridInner({
             align: "center",
             headerAlign: "center",
             renderCell: (params: GridRenderCellParams) => (
-              <Chip
-                size="small"
-                label={params.value ? "Yes" : "No"}
-                color={params.value ? "success" : "error"}
-                variant="filled"
-              />
+              <BooleanChip value={!!params.value} />
             ),
           } as GridColDef)
         : col,
@@ -299,6 +295,7 @@ function DataGridInner({
             id={selectedRow}
             entity={entity}
             columns={columnsDetails}
+            formFields={formFields}
             open={detailsOpen}
             handleClose={() => setDetailsOpen(false)}
           />

@@ -2,6 +2,9 @@
 
 import * as React from "react";
 import { capitalize, CircularProgress, Alert } from "@mui/material";
+import { BooleanChip } from "@/components/BooleanChip";
+import RoleCheckboxesField from "@/components/RoleCheckboxesField";
+import { FieldConfig } from "@/components/FormField";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -15,6 +18,7 @@ interface CustomTableDataType {
   query: any;
   columns: string[];
   id: number;
+  detailFields?: FieldConfig[];
   canView?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
@@ -24,12 +28,13 @@ export default function CustomTableData({
   query,
   columns,
   id,
+  detailFields = [],
 }: CustomTableDataType) {
   const { data, error, isLoading } = query({ id });
 
-  const renderValue = (value: unknown): string => {
+  const renderValue = (value: unknown): React.ReactNode => {
     if (value === null || value === undefined) return "-";
-    if (typeof value === "boolean") return value ? "Yes" : "No";
+    if (typeof value === "boolean") return <BooleanChip value={value} />;
     if (typeof value === "object") return JSON.stringify(value);
     return String(value);
   };
@@ -76,6 +81,24 @@ export default function CustomTableData({
           </TableBody>
         </Table>
       </TableContainer>
+
+      {data &&
+        detailFields.map((field) => {
+          if (field.type !== "role-checkboxes") return null;
+
+          return (
+            <Box key={field.name} sx={{ mt: 2 }}>
+              <RoleCheckboxesField
+                label={field.label || capitalize(field.name.replace(/_/g, " "))}
+                modulesUrl={
+                  field.optionsUrl || "/api/admin/modules?take=100&skip=0"
+                }
+                value={data[field.name]}
+                readOnly
+              />
+            </Box>
+          );
+        })}
     </>
   );
 }
