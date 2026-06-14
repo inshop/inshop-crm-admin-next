@@ -35,7 +35,12 @@ export default function CustomTableData({
   const renderValue = (value: unknown): React.ReactNode => {
     if (value === null || value === undefined) return "-";
     if (typeof value === "boolean") return <BooleanChip value={value} />;
-    if (typeof value === "object") return JSON.stringify(value);
+    if (typeof value === "object") {
+      if ("name" in value && typeof value.name === "string") {
+        return value.name;
+      }
+      return JSON.stringify(value);
+    }
     return String(value);
   };
 

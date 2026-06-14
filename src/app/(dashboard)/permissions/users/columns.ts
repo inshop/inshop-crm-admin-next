@@ -48,7 +48,7 @@ export const columnsList: GridColDef[] = [
   },
 ];
 
-export const columnsDetails = ["id", "name", "email", "isActive"];
+export const columnsDetails = ["id", "name", "email", "group", "isActive"];
 
 export const formFields: FieldConfig[] = [
   { name: "name" },
