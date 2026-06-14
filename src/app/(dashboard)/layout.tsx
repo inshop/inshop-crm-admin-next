@@ -17,8 +17,11 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Divider, useMediaQuery, useTheme } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import { useAuth } from "@/providers/AuthProvider";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog";
+import { api } from "@/lib/redux/api";
+import type { AppDispatch } from "@/lib/redux/store";
 
 const drawerWidth = 240;
 
@@ -31,6 +34,7 @@ export default function DashboardLayout({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [changePasswordOpen, setChangePasswordOpen] = React.useState(false);
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const { user } = useAuth();
 
   React.useEffect(() => {
@@ -64,6 +68,7 @@ export default function DashboardLayout({
       // Ignore errors, proceed with redirect
     }
     localStorage.removeItem("auth_user");
+    dispatch(api.util.resetApiState());
     router.replace("/");
   };
 

@@ -8,11 +8,13 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import FaceIcon from "@mui/icons-material/Face";
 import HistoryIcon from "@mui/icons-material/History";
 import NavMenuItem from "@/app/(dashboard)/navMenuItem";
+import { useAuth } from "@/providers/AuthProvider";
 
 export interface MenuItemType {
   name: string;
   icon: React.ReactNode;
   path?: string;
+  entity?: string;
   children?: MenuItemType[];
 }
 
@@ -31,10 +33,26 @@ export function hasActiveMenuChild(
   );
 }
 
+export function filterMenuItemsByPermission(
+  items: MenuItemType[],
+  canList: (entity: string) => boolean,
+): MenuItemType[] {
+  return items.flatMap((item) => {
+    if (item.children) {
+      const children = filterMenuItemsByPermission(item.children, canList);
+      if (children.length === 0) return [];
+      return [{ ...item, children }];
+    }
+    if (item.entity && !canList(item.entity)) return [];
+    return [item];
+  });
+}
+
 const menuItems: MenuItemType[] = [
   {
     name: "Clients",
     path: "/clients",
+    entity: "client",
     icon: <PeopleIcon />,
   },
   {
@@ -44,16 +62,19 @@ const menuItems: MenuItemType[] = [
       {
         name: "Users",
         path: "/permissions/users",
+        entity: "user",
         icon: <FaceIcon />,
       },
       {
         name: "Groups",
         path: "/permissions/groups",
+        entity: "group",
         icon: <GroupsIcon />,
       },
       {
         name: "Audit Log",
         path: "/permissions/audit",
+        entity: "audit",
         icon: <HistoryIcon />,
       },
     ],
@@ -61,10 +82,16 @@ const menuItems: MenuItemType[] = [
 ];
 
 export default function NavMenu() {
+  const { canList } = useAuth();
+  const visibleItems = filterMenuItemsByPermission(menuItems, canList);
+
   return (
     <List>
-      {menuItems.map((menuItem, index) => (
-        <NavMenuItem key={index} menuItem={menuItem}></NavMenuItem>
+      {visibleItems.map((menuItem) => (
+        <NavMenuItem
+          key={menuItem.path ?? menuItem.name}
+          menuItem={menuItem}
+        />
       ))}
     </List>
   );
