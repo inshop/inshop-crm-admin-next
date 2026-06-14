@@ -38,6 +38,16 @@ interface CustomDataGridType {
 
 const pageSizeOptions = [25, 50, 100];
 
+function useNoopMutation() {
+  const trigger = React.useCallback(
+    () => ({
+      unwrap: () => Promise.resolve(undefined),
+    }),
+    [],
+  );
+  return [trigger, { reset: () => {} }] as const;
+}
+
 export default function CustomDataGrid({
   query,
   entity,
@@ -106,7 +116,8 @@ function DataGridInner({
   canCreate,
 }: DataGridInnerProps) {
   const removeKey = `use${capitalize(pluralEntity)}ControllerRemoveMutation`;
-  const [triggerDelete] = api[removeKey]();
+  const useRemoveMutation = api[removeKey] ?? useNoopMutation;
+  const [triggerDelete] = useRemoveMutation();
 
   const [paginationModel, setPaginationModel] = useState({
     page: 0,

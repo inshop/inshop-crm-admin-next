@@ -35,7 +35,8 @@ const DialogDetails = ({
     })();
   }, [entity]);
 
-  const dialogMaxWidth = entity === "group" ? "lg" : undefined;
+  const wideDetailEntities = new Set(["group", "audit"]);
+  const dialogMaxWidth = wideDetailEntities.has(entity) ? "lg" : undefined;
   const detailFields = formFields.filter(
     (field) => field.type === "role-checkboxes",
   );

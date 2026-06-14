@@ -12,6 +12,8 @@ import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Box from "@mui/material/Box";
+import { formatDateTimeEu, isDateColumn } from "@/lib/format-date";
+import { AuditChangesView, AuditMetadataView } from "@/components/AuditChangesView";
 
 interface CustomTableDataType {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,8 +34,26 @@ export default function CustomTableData({
 }: CustomTableDataType) {
   const { data, error, isLoading } = query({ id });
 
-  const renderValue = (value: unknown): React.ReactNode => {
+  const renderValue = (
+    column: string,
+    value: unknown,
+    row?: Record<string, unknown>,
+  ): React.ReactNode => {
     if (value === null || value === undefined) return "-";
+    if (isDateColumn(column)) {
+      return formatDateTimeEu(value as string | Date);
+    }
+    if (column === "changes" && typeof value === "object") {
+      return (
+        <AuditChangesView
+          changes={value as Record<string, unknown>}
+          action={row?.action as string | undefined}
+        />
+      );
+    }
+    if (column === "metadata" && typeof value === "object") {
+      return <AuditMetadataView metadata={value as Record<string, unknown>} />;
+    }
     if (typeof value === "boolean") return <BooleanChip value={value} />;
     if (typeof value === "object") {
       if ("name" in value && typeof value.name === "string") {
@@ -80,7 +100,7 @@ export default function CustomTableData({
                   >
                     {capitalize(column.replace(/_/g, " "))}
                   </TableCell>
-                  <TableCell>{renderValue(data[column])}</TableCell>
+                  <TableCell>{renderValue(column, data[column], data)}</TableCell>
                 </TableRow>
               ))}
           </TableBody>

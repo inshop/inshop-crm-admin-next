@@ -5,12 +5,14 @@ import "./features/users";
 import "./features/groups";
 import "./features/clients";
 import "./features/contacts";
+import "./features/audits";
 
 const entities = [
   "users",
   "groups",
   "clients",
   "contacts",
+  "audits",
 ];
 
 type EntityTag = { type: "Entity"; id: string };

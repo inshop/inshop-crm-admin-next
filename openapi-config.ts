@@ -21,6 +21,9 @@ const config: ConfigFile = {
     './src/lib/redux/features/contacts.ts': {
       filterEndpoints: [/contacts/i],
     },
+    './src/lib/redux/features/audits.ts': {
+      filterEndpoints: [/audits/i],
+    },
   },
   hooks: true,
 }
