@@ -6,6 +6,7 @@ import Grid from "@mui/material/Grid";
 import CloseIcon from "@mui/icons-material/Close";
 import { ReactNode } from "react";
 import type { Breakpoint } from "@mui/material/styles";
+import type { SxProps, Theme } from "@mui/material/styles";
 
 interface DialogDetailsProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface DialogDetailsProps {
   children: ReactNode;
   fullScreen?: boolean;
   maxWidth?: Breakpoint | false;
+  contentSx?: SxProps<Theme>;
 }
 
 const CustomDialog = ({
@@ -21,6 +23,7 @@ const CustomDialog = ({
   children,
   fullScreen = false,
   maxWidth = "md",
+  contentSx,
 }: DialogDetailsProps) => {
   return (
     <Dialog
@@ -39,7 +42,7 @@ const CustomDialog = ({
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={fullScreen ? undefined : { pt: 1 }}>
+      <DialogContent sx={fullScreen ? undefined : { pt: 1, ...contentSx }}>
         {fullScreen ? (
           <Grid container spacing={6}>
             <Grid>{children}</Grid>

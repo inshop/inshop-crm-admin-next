@@ -25,6 +25,11 @@ function entityTag(entity: string, id: number): EntityTag {
   return { type: "Entity", id: `${entity}-${id}` };
 }
 
+function withAuditInvalidation(tags: EntityTag[], entity: string): EntityTag[] {
+  if (entity === "audits") return tags;
+  return [...tags, listTag("audits")];
+}
+
 const endpointEnhancements: Record<string, object> = {};
 
 for (const entity of entities) {
@@ -45,7 +50,7 @@ for (const entity of entities) {
     ],
   };
 
-  const listInvalidation = [listTag(entity)];
+  const listInvalidation = withAuditInvalidation([listTag(entity)], entity);
 
   endpointEnhancements[`${entity}ControllerCreate`] = {
     invalidatesTags: listInvalidation,
@@ -56,7 +61,11 @@ for (const entity of entities) {
       _result: unknown,
       _error: unknown,
       arg: { id: number },
-    ) => [listTag(entity), entityTag(entity, arg.id)],
+    ) =>
+      withAuditInvalidation(
+        [listTag(entity), entityTag(entity, arg.id)],
+        entity,
+      ),
   };
 
   endpointEnhancements[`${entity}ControllerRemove`] = {
