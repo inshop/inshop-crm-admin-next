@@ -50,8 +50,8 @@ export default function EntityAuditHistory({
     filter,
   });
 
-  const rows = (data?.[0] as AuditEntry[] | undefined) ?? [];
-  const total = (data?.[1] as number | undefined) ?? 0;
+  const [rows, total] =
+    (data as [AuditEntry[], number] | undefined) ?? [[], 0];
 
   if (isLoading) {
     return (
