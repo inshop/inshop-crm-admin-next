@@ -20,6 +20,7 @@ const injectedRtkApi = api.injectEndpoints({
         params: {
           take: queryArg.take,
           skip: queryArg.skip,
+          filter: queryArg.filter,
         },
       }),
     }),
@@ -60,6 +61,7 @@ export type GroupsControllerFindAllApiResponse = unknown;
 export type GroupsControllerFindAllApiArg = {
   take: number;
   skip: number;
+  filter?: string;
 };
 export type GroupsControllerFindOneApiResponse = unknown;
 export type GroupsControllerFindOneApiArg = {

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -20,6 +20,7 @@ import pluralize from "pluralize";
 import DialogDetails from "@/components/DialogDetails";
 import DialogEdit from "@/components/DialogEdit";
 import DialogCreate from "@/components/DialogCreate";
+import TableColumnFilters from "@/components/TableColumnFilters";
 import { FieldConfig } from "@/components/FormField";
 
 interface CustomDataGridType {
@@ -111,6 +112,9 @@ function DataGridInner({
     page: 0,
     pageSize: 25,
   });
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [queryFilters, setQueryFilters] = useState<Record<string, string>>({});
+  const queryFiltersKeyRef = useRef("{}");
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -130,6 +134,24 @@ function DataGridInner({
     const timer = setTimeout(() => setSuccessMessage(null), 5000);
     return () => clearTimeout(timer);
   }, [successMessage]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const next = Object.fromEntries(
+        Object.entries(filters).filter(([, value]) => value !== ""),
+      );
+      const nextKey = JSON.stringify(next);
+      if (queryFiltersKeyRef.current === nextKey) return;
+
+      queryFiltersKeyRef.current = nextKey;
+      setQueryFilters(next);
+      setPaginationModel((current) =>
+        current.page === 0 ? current : { ...current, page: 0 },
+      );
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [filters]);
 
   const handleRowClick = (params: GridRowParams) => {
     if (canView && params.row.id) {
@@ -222,6 +244,10 @@ function DataGridInner({
   const { data, error, isLoading } = query({
     take: paginationModel.pageSize,
     skip: paginationModel.page * paginationModel.pageSize,
+    filter:
+      Object.keys(queryFilters).length > 0
+        ? JSON.stringify(queryFilters)
+        : undefined,
   });
 
   const rows = useMemo(() => (data && data[0]) || [], [data]);
@@ -245,17 +271,33 @@ function DataGridInner({
         </Alert>
       )}
 
-      {canCreate && (
-        <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
+      <Box
+        sx={{
+          mb: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 2,
+          flexWrap: "wrap",
+        }}
+      >
+        <TableColumnFilters
+          columns={columnsList}
+          filters={filters}
+          onChange={setFilters}
+        />
+
+        {canCreate && (
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setCreateOpen(true)}
+            sx={{ flexShrink: 0 }}
           >
             Create {capitalize(entity)}
           </Button>
-        </Box>
-      )}
+        )}
+      </Box>
 
       <DataGrid
         rows={rows}
