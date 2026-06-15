@@ -14,9 +14,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const userAgent = req.headers.get("user-agent");
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      req.headers.get("x-real-ip") ??
+      "";
+
     const backendRes = await fetch(`${BACKEND_BASE_URL}/api/admin/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(userAgent ? { "User-Agent": userAgent } : {}),
+        ...(clientIp ? { "X-Forwarded-For": clientIp } : {}),
+      },
       body: JSON.stringify({ email, password }),
     });
 
