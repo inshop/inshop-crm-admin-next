@@ -15,6 +15,7 @@ The dashboard is the web UI for [InShop CRM API Config](https://github.com/insho
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Quick start](#quick-start)
+- [Docker](#docker)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Configuration](#configuration)
@@ -101,19 +102,43 @@ Audit trail for a single feature flag — who changed what and when.
 
 ## Quick start
 
-Run the full stack locally in three terminals.
+Clone both repositories as **sibling directories** (required for Docker full stack):
+
+```
+www/
+  inshop-crm-api-nest/
+  inshop-crm-admin-next/
+```
+
+### Option A — Docker (full stack)
+
+```bash
+git clone https://github.com/inshop/inshop-crm-api-nest.git
+git clone https://github.com/inshop/inshop-crm-admin-next.git
+cd inshop-crm-api-nest
+cp .env.example .env          # set JWT_SECRET
+cd ../inshop-crm-admin-next
+cp .env.local.example .env.local
+cd ../inshop-crm-api-nest
+docker compose -f docker-compose.dev.yml up
+```
+
+- Admin: [http://localhost:3000](http://localhost:3000)
+- API: [http://localhost:4000](http://localhost:4000) · Swagger: [http://localhost:4000/api](http://localhost:4000/api)
+
+See [Docker](#docker) for prod setup and running from this repo.
+
+### Option B — Local Node.js
 
 **1. Start the API and database** — see the [API quick start](https://github.com/inshop/inshop-crm-api-nest#quick-start):
 
 ```bash
 cd inshop-crm-api-nest
 yarn install
-cp .env.example .env   # set JWT_SECRET
-docker compose up -d
+cp .env.example .env          # set JWT_SECRET
+docker compose -f docker-compose.dev.yml up db -d
 yarn start:dev
 ```
-
-API: [http://localhost:4000](http://localhost:4000) · Swagger: [http://localhost:4000/api](http://localhost:4000/api)
 
 **2. Start the dashboard:**
 
@@ -124,17 +149,56 @@ cp .env.local.example .env.local
 yarn dev
 ```
 
-**3. Sign in** at [http://localhost:3000](http://localhost:3000) with the default admin credentials from the [API README](https://github.com/inshop/inshop-crm-api-nest#run):
+**3. Sign in** at [http://localhost:3000](http://localhost:3000) with the default admin credentials:
 
 | Email | Password |
 |-------|----------|
 | `admin@admin.admin` | `admin@admin.admin` |
 
+## Docker
+
+Compose files run the **full stack** (PostgreSQL + API + admin dashboard). Configuration is read from `../inshop-crm-api-nest/.env` and `.env.local` (this repo).
+
+| File | Purpose |
+|------|---------|
+| `docker-compose.dev.yml` | Hot reload via `yarn start:dev` / `yarn dev` |
+| `docker-compose.prod.yml` | Pre-built images from [GHCR](https://github.com/inshop?tab=packages) |
+| `docker-compose.yml` | Local overrides (gitignored) |
+
+### Development
+
+From this repo — pass the API `.env` for database settings:
+
+```bash
+cp .env.local.example .env.local
+cp ../inshop-crm-api-nest/.env.example ../inshop-crm-api-nest/.env   # set JWT_SECRET
+
+docker compose -f docker-compose.dev.yml --env-file ../inshop-crm-api-nest/.env up
+docker compose -f docker-compose.dev.yml --env-file ../inshop-crm-api-nest/.env up -d
+docker compose -f docker-compose.dev.yml down
+```
+
+Or run from the [API repo](https://github.com/inshop/inshop-crm-api-nest#docker) without `--env-file`.
+
+Inside Docker, `BACKEND_BASE_URL` is overridden to `http://api:4000` (server-side proxy). `NEXT_PUBLIC_BACKEND_BASE_URL` in `.env.local` is still used for client-side `curl` examples (`http://localhost:4000` by default).
+
+### Production
+
+```bash
+cp .env.local.example .env.local
+# ensure ../inshop-crm-api-nest/.env has JWT_SECRET and DATABASE_PASSWORD
+
+docker compose -f docker-compose.prod.yml --env-file ../inshop-crm-api-nest/.env up -d
+```
+
+Uses `ghcr.io/inshop/inshop-crm-admin-next` and `ghcr.io/inshop/inshop-crm-api-nest` images. See [API Docker docs](https://github.com/inshop/inshop-crm-api-nest#docker) for image tags and prod variables.
+
 ## Prerequisites
 
 - **Node.js** 22+
 - **Yarn**
-- Running [inshop-crm-api-nest](https://github.com/inshop/inshop-crm-api-nest) backend (PostgreSQL via Docker)
+- **Docker** (for full stack via Compose)
+- Running [inshop-crm-api-nest](https://github.com/inshop/inshop-crm-api-nest) backend when not using Docker full stack
 
 ## Installation
 
@@ -145,7 +209,7 @@ cp .env.local.example .env.local
 
 ## Configuration
 
-Edit `.env.local`:
+Edit `.env.local` (for local Node.js and Docker):
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -158,6 +222,8 @@ Example:
 BACKEND_BASE_URL=http://localhost:4000
 NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:4000
 ```
+
+When running the Docker stack, `BACKEND_BASE_URL` is overridden to `http://api:4000` inside the admin container. Keep `NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:4000` so browser-facing `curl` examples point at the exposed API port.
 
 ## Usage guide
 
@@ -235,13 +301,13 @@ yarn test:e2e
 
 Playwright starts `yarn dev` automatically unless port 3000 is already in use.
 
-For full-stack E2E, start the API and Postgres first — see [API testing](https://github.com/inshop/inshop-crm-api-nest#tests).
+For full-stack E2E, start the API and Postgres first — see [API testing](https://github.com/inshop/inshop-crm-api-nest#tests) or run `docker compose -f docker-compose.dev.yml up` from either repo.
 
 CI runs `yarn test`, `yarn build`, and `yarn test:e2e` — see [`.github/workflows/test.yml`](.github/workflows/test.yml).
 
 ## Related documentation
 
-- [API repository](https://github.com/inshop/inshop-crm-api-nest) — NestJS backend, database setup, REST endpoints, Swagger
+- [API repository](https://github.com/inshop/inshop-crm-api-nest) — NestJS backend, Docker setup, REST endpoints, Swagger
 - [API authentication](https://github.com/inshop/inshop-crm-api-nest#authentication)
 - [Client feature flags API](https://github.com/inshop/inshop-crm-api-nest#client-feature-flags-api-token) — bootstrap and single-flag endpoints for apps
 - [API tokens](https://github.com/inshop/inshop-crm-api-nest#admin-api-tokens) — create and manage `ff_…` tokens
