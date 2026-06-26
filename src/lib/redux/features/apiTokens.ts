@@ -102,13 +102,11 @@ export type ApiTokensControllerRemoveApiArg = {
 };
 export type CreateApiTokenDto = {
   name: string;
-  projectId: number;
   environmentId: number;
   isActive: boolean;
 };
 export type UpdateApiTokenDto = {
   name?: string;
-  projectId?: number;
   environmentId?: number;
   isActive?: boolean;
 };

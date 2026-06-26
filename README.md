@@ -70,7 +70,7 @@ Role-based access control (RBAC) managed through groups.
 
 #### API tokens
 
-- Issue scoped tokens (`ff_…`) for a single project + environment pair
+- Issue scoped tokens (`ff_…`) for a single environment
 - Copy-ready `curl` examples for bootstrap and single-flag endpoints
 - Regenerate tokens when the plain value is no longer available
 
@@ -236,7 +236,7 @@ Open [http://localhost:3000](http://localhost:3000). The dashboard proxies authe
 1. **Projects** → create a project (e.g. `My App`, code `my-app`)
 2. **Environments** → create environments (e.g. `Staging`, code `staging`)
 3. **Feature Flags** → create a flag, assign projects, toggle per environment
-4. **Permissions → API Tokens** → create a token scoped to project + environment
+4. **Permissions → API Tokens** → create a token scoped to an environment
 5. Use the token in your app — see [client feature flags API](https://github.com/inshop/inshop-crm-api-nest#client-feature-flags-api-token)
 
 ### Navigation and permissions

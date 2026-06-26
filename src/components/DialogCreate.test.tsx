@@ -25,7 +25,6 @@ describe("DialogCreate plainToken", () => {
           id: 1,
           name: "CI token",
           plainToken: "ff_test_secret_token",
-          project: { code: "my-app" },
           environment: { code: "staging" },
         }),
     });
@@ -58,7 +57,7 @@ describe("DialogCreate plainToken", () => {
     expect(screen.getByText("ff_test_secret_token")).toBeInTheDocument();
     expect(screen.getByText(/example usage/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/feature-flags\/bootstrap\?project=my-app&environment=staging/),
+      screen.getByText(/feature-flags\/bootstrap\?project=YOUR_PROJECT_CODE&environment=staging/),
     ).toBeInTheDocument();
     expect(handleClose).not.toHaveBeenCalled();
 

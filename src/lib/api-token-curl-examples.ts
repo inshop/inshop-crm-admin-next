@@ -4,12 +4,11 @@ export function getPublicApiBaseUrl(): string {
 
 export function buildApiTokenCurlExamples(
   token: string,
-  projectCode: string,
   environmentCode: string,
   baseUrl = getPublicApiBaseUrl(),
 ): string {
   const authHeader = `Authorization: Bearer ${token}`;
-  const query = `project=${encodeURIComponent(projectCode)}&environment=${encodeURIComponent(environmentCode)}`;
+  const query = `project=YOUR_PROJECT_CODE&environment=${encodeURIComponent(environmentCode)}`;
 
   return `# Bootstrap all active flags
 curl -s "${baseUrl}/api/feature-flags/bootstrap?${query}" \\

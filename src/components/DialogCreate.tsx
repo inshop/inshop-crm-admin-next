@@ -15,7 +15,6 @@ import ApiTokenCurlSamples from "@/components/ApiTokenCurlSamples";
 interface ApiTokenCreatedInfo {
   id: number;
   plainToken: string;
-  projectCode: string;
   environmentCode: string;
 }
 
@@ -148,14 +147,12 @@ function CreateForm({
         const created = response as {
           id: number;
           plainToken: string;
-          project?: { code?: string };
           environment?: { code?: string };
         };
 
         setTokenCreated({
           id: created.id,
           plainToken: created.plainToken,
-          projectCode: created.project?.code ?? "PROJECT_CODE",
           environmentCode: created.environment?.code ?? "ENVIRONMENT_CODE",
         });
         onSuccess?.();
@@ -184,7 +181,6 @@ function CreateForm({
         <>
           <ApiTokenCurlSamples
             plainToken={tokenCreated.plainToken}
-            projectCode={tokenCreated.projectCode}
             environmentCode={tokenCreated.environmentCode}
             showTokenWarning
           />

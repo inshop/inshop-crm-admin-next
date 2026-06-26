@@ -23,7 +23,6 @@ export default function ApiTokenDetailsCurlSamples({
 
   const token = data as {
     plainToken?: string;
-    project?: { code?: string };
     environment?: { code?: string };
   };
 
@@ -44,7 +43,6 @@ export default function ApiTokenDetailsCurlSamples({
   return (
     <ApiTokenCurlSamples
       plainToken={plainToken}
-      projectCode={token.project?.code ?? "PROJECT_CODE"}
       environmentCode={token.environment?.code ?? "ENVIRONMENT_CODE"}
       onRegenerate={plainToken ? undefined : handleRegenerate}
       isRegenerating={isRegenerating}

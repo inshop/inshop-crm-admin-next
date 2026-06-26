@@ -7,7 +7,6 @@ import Alert from "@mui/material/Alert";
 import { buildApiTokenCurlExamples } from "@/lib/api-token-curl-examples";
 
 interface ApiTokenCurlSamplesProps {
-  projectCode: string;
   environmentCode: string;
   plainToken?: string;
   showTokenWarning?: boolean;
@@ -16,7 +15,6 @@ interface ApiTokenCurlSamplesProps {
 }
 
 export default function ApiTokenCurlSamples({
-  projectCode,
   environmentCode,
   plainToken,
   showTokenWarning = false,
@@ -25,11 +23,7 @@ export default function ApiTokenCurlSamples({
 }: ApiTokenCurlSamplesProps) {
   const hasRealToken = !!plainToken;
   const curlExamples = hasRealToken
-    ? buildApiTokenCurlExamples(
-        plainToken,
-        projectCode,
-        environmentCode,
-      )
+    ? buildApiTokenCurlExamples(plainToken, environmentCode)
     : null;
 
   return (

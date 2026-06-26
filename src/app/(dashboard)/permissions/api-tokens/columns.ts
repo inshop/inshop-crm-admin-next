@@ -20,15 +20,6 @@ export const columnsList: GridColDef[] = [
     disableColumnMenu: true,
   },
   {
-    field: "project",
-    headerName: "Project",
-    flex: 0.2,
-    minWidth: 140,
-    sortable: false,
-    disableColumnMenu: true,
-    renderCell: (params) => params.row.project?.name ?? "-",
-  },
-  {
     field: "environment",
     headerName: "Environment",
     flex: 0.2,
@@ -62,7 +53,6 @@ export const columnsList: GridColDef[] = [
 export const columnsDetails = [
   "id",
   "name",
-  "project",
   "environment",
   "isActive",
   "createdAt",
@@ -71,13 +61,6 @@ export const columnsDetails = [
 
 export const formFields: FieldConfig[] = [
   { name: "name", required: true },
-  {
-    name: "projectId",
-    type: "select",
-    label: "Project",
-    required: true,
-    optionsUrl: "/api/admin/projects?take=100&skip=0",
-  },
   {
     name: "environmentId",
     type: "select",
