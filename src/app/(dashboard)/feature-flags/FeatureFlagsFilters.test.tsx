@@ -61,11 +61,11 @@ describe("FeatureFlagsFilters", () => {
   it("renders text, date, and autocomplete fields", () => {
     renderFilters();
 
-    expect(screen.getByLabelText("Name")).toBeInTheDocument();
-    expect(screen.getByLabelText("Code")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Name")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Code")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Choose date" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Created by")).toBeInTheDocument();
-    expect(screen.getByLabelText("Projects")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Created by")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Projects")).toBeInTheDocument();
     expect(screen.getByText("Dev")).toBeInTheDocument();
     expect(screen.getByText("Prod")).toBeInTheDocument();
   });
@@ -79,7 +79,7 @@ describe("FeatureFlagsFilters", () => {
       </LocalizationProvider>,
     );
 
-    const nameInput = screen.getByLabelText("Name");
+    const nameInput = screen.getByPlaceholderText("Name");
     await user.type(nameInput, "checkout");
 
     expect(nameInput).toHaveValue("checkout");
@@ -116,7 +116,7 @@ describe("FeatureFlagsFilters", () => {
       filters: { name: "foo", env_1: "true" },
     });
 
-    await user.click(screen.getByRole("button", { name: "Clear filters" }));
+    await user.click(screen.getByRole("button", { name: "Clear" }));
 
     expect(onChange).toHaveBeenCalledWith({});
   });

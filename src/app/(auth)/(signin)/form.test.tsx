@@ -53,7 +53,7 @@ describe("Sign-in form", () => {
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     expect(
-      await screen.findByText("Password can not be empty."),
+      await screen.findByText("Password cannot be empty."),
     ).toBeInTheDocument();
   });
 
