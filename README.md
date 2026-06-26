@@ -2,11 +2,11 @@
 
 **Next.js admin panel for managing feature flags, projects, environments, users, and API tokens.**
 
-The dashboard is the web UI for [InShop CRM API Config](https://github.com/inshopgroup/inshop-crm-api-nest) — a self-hosted feature flag and configuration management system. Use it to create flags, toggle them per environment, manage access control, and issue API tokens for client applications.
+The dashboard is the web UI for [InShop CRM API Config](https://github.com/inshop/inshop-crm-api-nest) — a self-hosted feature flag and configuration management system. Use it to create flags, toggle them per environment, manage access control, and issue API tokens for client applications.
 
 | | |
 |---|---|
-| **Backend API** | [inshop-crm-api-nest](https://github.com/inshopgroup/inshop-crm-api-nest) |
+| **Backend API** | [inshop-crm-api-nest](https://github.com/inshop/inshop-crm-api-nest) |
 | **Stack** | Next.js 16 · React 19 · MUI · Redux Toolkit · TypeScript |
 | **Default URL** | [http://localhost:3000](http://localhost:3000) |
 
@@ -37,7 +37,7 @@ Central module for boolean feature toggles across projects and environments.
 - **Details dialog** — view flag metadata, toggle environments, and browse change history
 - **Delete** — remove flags with confirmation
 
-A flag is **active** for a client only when it is linked to the project, enabled in that environment, and not past its expiry date. See [client API docs](https://github.com/inshopgroup/inshop-crm-api-nest#client-feature-flags-api-token) for how apps consume flags.
+A flag is **active** for a client only when it is linked to the project, enabled in that environment, and not past its expiry date. See [client API docs](https://github.com/inshop/inshop-crm-api-nest#client-feature-flags-api-token) for how apps consume flags.
 
 ### Projects
 
@@ -103,7 +103,7 @@ Audit trail for a single feature flag — who changed what and when.
 
 Run the full stack locally in three terminals.
 
-**1. Start the API and database** — see the [API quick start](https://github.com/inshopgroup/inshop-crm-api-nest#quick-start):
+**1. Start the API and database** — see the [API quick start](https://github.com/inshop/inshop-crm-api-nest#quick-start):
 
 ```bash
 cd inshop-crm-api-nest
@@ -124,7 +124,7 @@ cp .env.local.example .env.local
 yarn dev
 ```
 
-**3. Sign in** at [http://localhost:3000](http://localhost:3000) with the default admin credentials from the [API README](https://github.com/inshopgroup/inshop-crm-api-nest#run):
+**3. Sign in** at [http://localhost:3000](http://localhost:3000) with the default admin credentials from the [API README](https://github.com/inshop/inshop-crm-api-nest#run):
 
 | Email | Password |
 |-------|----------|
@@ -134,7 +134,7 @@ yarn dev
 
 - **Node.js** 22+
 - **Yarn**
-- Running [inshop-crm-api-nest](https://github.com/inshopgroup/inshop-crm-api-nest) backend (PostgreSQL via Docker)
+- Running [inshop-crm-api-nest](https://github.com/inshop/inshop-crm-api-nest) backend (PostgreSQL via Docker)
 
 ## Installation
 
@@ -171,7 +171,7 @@ Open [http://localhost:3000](http://localhost:3000). The dashboard proxies authe
 2. **Environments** → create environments (e.g. `Staging`, code `staging`)
 3. **Feature Flags** → create a flag, assign projects, toggle per environment
 4. **Permissions → API Tokens** → create a token scoped to project + environment
-5. Use the token in your app — see [client feature flags API](https://github.com/inshopgroup/inshop-crm-api-nest#client-feature-flags-api-token)
+5. Use the token in your app — see [client feature flags API](https://github.com/inshop/inshop-crm-api-nest#client-feature-flags-api-token)
 
 ### Navigation and permissions
 
@@ -235,14 +235,14 @@ yarn test:e2e
 
 Playwright starts `yarn dev` automatically unless port 3000 is already in use.
 
-For full-stack E2E, start the API and Postgres first — see [API testing](https://github.com/inshopgroup/inshop-crm-api-nest#tests).
+For full-stack E2E, start the API and Postgres first — see [API testing](https://github.com/inshop/inshop-crm-api-nest#tests).
 
 CI runs `yarn test`, `yarn build`, and `yarn test:e2e` — see [`.github/workflows/test.yml`](.github/workflows/test.yml).
 
 ## Related documentation
 
-- [API repository](https://github.com/inshopgroup/inshop-crm-api-nest) — NestJS backend, database setup, REST endpoints, Swagger
-- [API authentication](https://github.com/inshopgroup/inshop-crm-api-nest#authentication)
-- [Client feature flags API](https://github.com/inshopgroup/inshop-crm-api-nest#client-feature-flags-api-token) — bootstrap and single-flag endpoints for apps
-- [API tokens](https://github.com/inshopgroup/inshop-crm-api-nest#admin-api-tokens) — create and manage `ff_…` tokens
-- [Permissions and roles](https://github.com/inshopgroup/inshop-crm-api-nest#permissions-and-roles)
+- [API repository](https://github.com/inshop/inshop-crm-api-nest) — NestJS backend, database setup, REST endpoints, Swagger
+- [API authentication](https://github.com/inshop/inshop-crm-api-nest#authentication)
+- [Client feature flags API](https://github.com/inshop/inshop-crm-api-nest#client-feature-flags-api-token) — bootstrap and single-flag endpoints for apps
+- [API tokens](https://github.com/inshop/inshop-crm-api-nest#admin-api-tokens) — create and manage `ff_…` tokens
+- [Permissions and roles](https://github.com/inshop/inshop-crm-api-nest#permissions-and-roles)
