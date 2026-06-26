@@ -18,6 +18,18 @@ describe("FormField", () => {
     expect(onChange).toHaveBeenCalled();
   });
 
+  it("marks required text fields", () => {
+    renderWithProviders(
+      <FormField
+        config={{ name: "name", required: true }}
+        value=""
+        onChange={() => undefined}
+      />,
+    );
+
+    expect(screen.getByLabelText(/Name/)).toBeRequired();
+  });
+
   it("renders password field", () => {
     renderWithProviders(
       <FormField

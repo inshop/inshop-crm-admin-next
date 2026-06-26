@@ -30,7 +30,7 @@ describe("Sign-in form", () => {
             id: 1,
             name: "Admin",
             email: "admin@example.com",
-            roles: ["ROLE_CLIENT_LIST"],
+            roles: ["ROLE_FEATURE_FLAG_LIST"],
           },
         });
       }
@@ -66,7 +66,7 @@ describe("Sign-in form", () => {
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(replaceMock).toHaveBeenCalledWith("/clients");
+      expect(replaceMock).toHaveBeenCalledWith("/feature-flags");
     });
 
     const stored = JSON.parse(localStorage.getItem("auth_user") || "{}");

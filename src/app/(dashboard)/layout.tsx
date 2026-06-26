@@ -15,15 +15,62 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { Divider, useMediaQuery, useTheme } from "@mui/material";
+import { Divider, useMediaQuery, useTheme, alpha } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { useAuth } from "@/providers/AuthProvider";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog";
 import { api } from "@/lib/redux/api";
 import type { AppDispatch } from "@/lib/redux/store";
+import FlagIcon from "@mui/icons-material/Flag";
 
-const drawerWidth = 240;
+const drawerWidth = 256;
+
+function TopBarBrand() {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+      <Box
+        sx={{
+          width: 30,
+          height: 30,
+          borderRadius: "8px",
+          background: "linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          boxShadow: "0 4px 12px rgba(37,99,235,0.4)",
+        }}
+      >
+        <FlagIcon sx={{ fontSize: 16, color: "#fff" }} />
+      </Box>
+      <Box>
+        <Typography
+          sx={{
+            fontSize: "0.9375rem",
+            fontWeight: 700,
+            color: "#F8FAFC",
+            lineHeight: 1.2,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Feature Flags
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: "0.6rem",
+            color: "#475569",
+            lineHeight: 1,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+          }}
+        >
+          Admin Console
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
 
 export default function DashboardLayout({
   children,
@@ -35,27 +82,18 @@ export default function DashboardLayout({
   const [changePasswordOpen, setChangePasswordOpen] = React.useState(false);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   React.useEffect(() => {
-    if (isMobile) {
-      setDrawerOpen(false);
-    }
+    if (isMobile) setDrawerOpen(false);
   }, [isMobile]);
 
   const showDrawer = !isMobile && drawerOpen;
 
-  const handleDrawerToggle = () => {
-    setDrawerOpen((open) => !open);
-  };
-
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleDrawerToggle = () => setDrawerOpen((open) => !open);
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) =>
     setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleClose = () => setAnchorEl(null);
 
   const handleSignOut = async () => {
     handleClose();
@@ -67,57 +105,86 @@ export default function DashboardLayout({
     } catch {
       // Ignore errors, proceed with redirect
     }
-    localStorage.removeItem("auth_user");
+    logout();
     dispatch(api.util.resetApiState());
     router.replace("/");
   };
 
+  const drawerContent = (
+    <Box sx={{ overflow: "auto", py: 1 }}>
+      <NavMenu />
+    </Box>
+  );
+
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <CssBaseline />
+
       <AppBar
         position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}
       >
-        <Toolbar>
+        <Toolbar sx={{ gap: 1 }}>
           <IconButton
             size="large"
             edge="start"
             color="inherit"
-            aria-label="menu"
+            aria-label="toggle sidebar"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2 }}
+            sx={{
+              mr: 1,
+              color: "#94A3B8",
+              "&:hover": { backgroundColor: alpha("#94A3B8", 0.1), color: "#F8FAFC" },
+            }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Inshop CRM
-          </Typography>
-          <Typography component="span" sx={{ mr: 2 }}>
-            {user ? `${user.name} (${user.email})` : "Account"}
-          </Typography>
+
+          <TopBarBrand />
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          {user && (
+            <Box
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                alignItems: "center",
+                gap: 1,
+                mr: 0.5,
+              }}
+            >
+              <Box sx={{ textAlign: "right" }}>
+                <Typography
+                  sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "#F1F5F9", lineHeight: 1.2 }}
+                >
+                  {user.name}
+                </Typography>
+                <Typography sx={{ fontSize: "0.6875rem", color: "#64748B", lineHeight: 1 }}>
+                  {user.email}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
           <IconButton
-            size="large"
-            aria-label="account of current user"
+            aria-label="account menu"
             aria-controls="menu-appbar"
             aria-haspopup="true"
             onClick={handleMenu}
-            color="inherit"
+            sx={{
+              color: "#94A3B8",
+              "&:hover": { backgroundColor: alpha("#94A3B8", 0.1), color: "#F8FAFC" },
+            }}
           >
             <AccountCircleIcon />
           </IconButton>
+
           <Menu
             id="menu-appbar"
             anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
             keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
@@ -129,46 +196,63 @@ export default function DashboardLayout({
             >
               Change password
             </MenuItem>
-            <Divider />
-            <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
+            <Divider sx={{ my: 0.5 }} />
+            <MenuItem onClick={handleSignOut} sx={{ color: "error.main" }}>
+              Sign out
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
-      <Drawer
-        variant={isMobile ? "temporary" : "persistent"}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        ModalProps={{ keepMounted: true }}
-        sx={{
-          width: isMobile ? undefined : drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: "auto" }}>
-          <NavMenu />
-        </Box>
-      </Drawer>
+
+      {isMobile ? (
+        <Drawer
+          variant="temporary"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
+          }}
+        >
+          <Toolbar />
+          {drawerContent}
+        </Drawer>
+      ) : (
+        <Drawer
+          variant="persistent"
+          open={drawerOpen}
+          sx={{
+            flexShrink: 0,
+            width: drawerOpen ? drawerWidth : 0,
+            overflow: "hidden",
+            transition: "width 0.2s ease",
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              boxSizing: "border-box",
+              transition: "transform 0.2s ease",
+            },
+          }}
+        >
+          <Toolbar />
+          {drawerContent}
+        </Drawer>
+      )}
+
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           minWidth: 0,
-          p: 3,
-          ...(isMobile
-            ? {}
-            : {
-                ml: showDrawer ? 0 : `-${drawerWidth}px`,
-              }),
+          backgroundColor: "background.default",
+          minHeight: "100vh",
         }}
       >
         <Toolbar />
-        <Suspense fallback={<Loading />}>{children}</Suspense>
+        <Box sx={{ p: 3 }}>
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+        </Box>
       </Box>
+
       <ChangePasswordDialog
         open={changePasswordOpen}
         onClose={() => setChangePasswordOpen(false)}

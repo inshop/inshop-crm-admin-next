@@ -3,16 +3,20 @@ import { api } from "./api";
 import "./features/auth";
 import "./features/users";
 import "./features/groups";
-import "./features/clients";
-import "./features/contacts";
+import "./features/projects";
+import "./features/environments";
+import "./features/featureFlags";
 import "./features/audits";
+import "./features/apiTokens";
 
 const entities = [
   "users",
   "groups",
-  "clients",
-  "contacts",
+  "projects",
+  "environments",
+  "featureFlags",
   "audits",
+  "apiTokens",
 ];
 
 type EntityTag = { type: "Entity"; id: string };
@@ -74,5 +78,18 @@ for (const entity of entities) {
 }
 
 api.enhanceEndpoints({
-  endpoints: endpointEnhancements,
+  endpoints: {
+    ...endpointEnhancements,
+    featureFlagsControllerUpdateEnvironmentValue: {
+      invalidatesTags: (
+        _result: unknown,
+        _error: unknown,
+        arg: { id: number },
+      ) => [
+        { type: "Entity" as const, id: "featureFlags-LIST" },
+        { type: "Entity" as const, id: `featureFlags-${arg.id}` },
+        { type: "Entity" as const, id: "audits-LIST" },
+      ],
+    },
+  },
 });

@@ -16,12 +16,15 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 import pluralize from "pluralize";
 import DialogDetails from "@/components/DialogDetails";
 import DialogEdit from "@/components/DialogEdit";
 import DialogCreate from "@/components/DialogCreate";
 import TableColumnFilters from "@/components/TableColumnFilters";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { FieldConfig } from "@/components/FormField";
+import { dataGridSx } from "@/lib/dataGridSx";
 
 interface CustomDataGridType {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,6 +33,7 @@ interface CustomDataGridType {
   columnsList: GridColDef[];
   columnsDetails: string[];
   formFields: FieldConfig[];
+  editFormFields?: FieldConfig[];
   canView?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
@@ -54,6 +58,7 @@ export default function CustomDataGrid({
   columnsList,
   columnsDetails,
   formFields,
+  editFormFields,
   canView = true,
   canEdit = true,
   canDelete = true,
@@ -78,6 +83,7 @@ export default function CustomDataGrid({
       columnsList={columnsList}
       columnsDetails={columnsDetails}
       formFields={formFields}
+      editFormFields={editFormFields}
       canView={canView}
       canEdit={canEdit}
       canDelete={canDelete}
@@ -96,6 +102,7 @@ interface DataGridInnerProps {
   columnsList: GridColDef[];
   columnsDetails: string[];
   formFields: FieldConfig[];
+  editFormFields?: FieldConfig[];
   canView: boolean;
   canEdit: boolean;
   canDelete: boolean;
@@ -110,6 +117,7 @@ function DataGridInner({
   columnsList,
   columnsDetails,
   formFields,
+  editFormFields,
   canView,
   canEdit,
   canDelete,
@@ -131,6 +139,7 @@ function DataGridInner({
   const [editOpen, setEditOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -141,7 +150,6 @@ function DataGridInner({
 
   useEffect(() => {
     if (!successMessage) return;
-
     const timer = setTimeout(() => setSuccessMessage(null), 5000);
     return () => clearTimeout(timer);
   }, [successMessage]);
@@ -153,14 +161,12 @@ function DataGridInner({
       );
       const nextKey = JSON.stringify(next);
       if (queryFiltersKeyRef.current === nextKey) return;
-
       queryFiltersKeyRef.current = nextKey;
       setQueryFilters(next);
       setPaginationModel((current) =>
         current.page === 0 ? current : { ...current, page: 0 },
       );
     }, 300);
-
     return () => clearTimeout(timer);
   }, [filters]);
 
@@ -178,19 +184,24 @@ function DataGridInner({
     }
   };
 
-  const handleDelete = async (params: GridRowParams) => {
+  const handleDeleteRequest = (params: GridRowParams) => {
     if (!canDelete || !params.row.id) return;
-    if (!confirm("Are you sure you want to delete this item?")) return;
+    setPendingDeleteId(params.row.id);
+  };
 
+  const handleDeleteConfirm = async () => {
+    if (!pendingDeleteId) return;
     setDeleteError(null);
     try {
-      await triggerDelete({ id: params.row.id }).unwrap();
+      await triggerDelete({ id: pendingDeleteId }).unwrap();
+      setPendingDeleteId(null);
       showSuccess("deleted");
     } catch (err: unknown) {
       const message =
         err && typeof err === "object" && "data" in err
           ? (err as { data: { message?: string } }).data?.message
           : "Failed to delete";
+      setPendingDeleteId(null);
       setDeleteError(message || "Failed to delete");
     }
   };
@@ -212,7 +223,7 @@ function DataGridInner({
     if (canEdit || canDelete) {
       cols.push({
         flex: 0.1,
-        minWidth: 150,
+        minWidth: 120,
         sortable: false,
         disableColumnMenu: true,
         field: "actions",
@@ -225,7 +236,7 @@ function DataGridInner({
             actions.push(
               <GridActionsCellItem
                 key="edit"
-                icon={<EditIcon />}
+                icon={<EditIcon fontSize="small" />}
                 onClick={() => handleEdit(params)}
                 label="Edit"
               />,
@@ -236,9 +247,9 @@ function DataGridInner({
             actions.push(
               <GridActionsCellItem
                 key="delete"
-                icon={<DeleteIcon />}
-                onClick={() => handleDelete(params)}
-                label="Remove"
+                icon={<DeleteIcon fontSize="small" color="error" />}
+                onClick={() => handleDeleteRequest(params)}
+                label="Delete"
               />,
             );
           }
@@ -282,14 +293,19 @@ function DataGridInner({
         </Alert>
       )}
 
-      <Box
+      <Paper
+        elevation={0}
         sx={{
-          mb: 2,
+          px: 0,
+          py: 1.5,
+          mb: 1,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
           gap: 2,
           flexWrap: "wrap",
+          backgroundColor: "transparent",
+          border: "none",
         }}
       >
         <TableColumnFilters
@@ -308,12 +324,14 @@ function DataGridInner({
             Create {capitalize(entity)}
           </Button>
         )}
-      </Box>
+      </Paper>
 
       <DataGrid
         rows={rows}
         rowCount={rowCount}
         columns={_columns}
+        density="comfortable"
+        autoHeight
         initialState={{
           pagination: {
             paginationModel: { pageSize: 25 },
@@ -336,9 +354,8 @@ function DataGridInner({
           },
         }}
         sx={{
-          "& .MuiDataGrid-row:hover": {
-            cursor: canView ? "pointer" : "",
-          },
+          ...dataGridSx,
+          "& .MuiDataGrid-row:hover": { cursor: canView ? "pointer" : "default", backgroundColor: "rgba(37,99,235,0.03)" },
         }}
       />
 
@@ -355,7 +372,7 @@ function DataGridInner({
           <DialogEdit
             id={selectedRow}
             entity={entity}
-            fields={formFields}
+            fields={editFormFields ?? formFields}
             open={editOpen}
             handleClose={() => setEditOpen(false)}
             onSuccess={() => showSuccess("updated")}
@@ -369,6 +386,15 @@ function DataGridInner({
         open={createOpen}
         handleClose={() => setCreateOpen(false)}
         onSuccess={() => showSuccess("created")}
+      />
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title={`Delete ${capitalize(entity)}`}
+        message={`Are you sure you want to delete this ${entity.toLowerCase()}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setPendingDeleteId(null)}
       />
     </>
   );

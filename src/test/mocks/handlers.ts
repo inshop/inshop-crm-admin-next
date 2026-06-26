@@ -11,7 +11,7 @@ export const handlers = [
           id: 1,
           name: "Admin",
           email: "admin@example.com",
-          roles: ["ROLE_CLIENT_LIST"],
+          roles: ["ROLE_PROJECT_LIST"],
           exp,
         }),
       )
@@ -28,7 +28,7 @@ export const handlers = [
           id: 1,
           name: "Admin",
           email: "admin@example.com",
-          roles: ["ROLE_CLIENT_LIST"],
+          roles: ["ROLE_PROJECT_LIST"],
         },
         token,
         refreshToken: token,
@@ -39,17 +39,17 @@ export const handlers = [
   }),
 
   http.get("/api/admin/modules", () => {
-    return HttpResponse.json([[{ id: 1, name: "clients" }], 1]);
+    return HttpResponse.json([[{ id: 1, name: "projects" }], 1]);
   }),
 
   http.get("/api/admin/modules/:moduleId/roles", () => {
     return HttpResponse.json([
-      { id: 10, name: "ROLE_CLIENT_LIST" },
-      { id: 11, name: "ROLE_CLIENT_CREATE" },
+      { id: 10, name: "ROLE_PROJECT_LIST" },
+      { id: 11, name: "ROLE_PROJECT_CREATE" },
     ]);
   }),
 
-  http.get("/api/admin/clients", () => {
+  http.get("/api/admin/projects", () => {
     return HttpResponse.json([[], 0]);
   }),
 

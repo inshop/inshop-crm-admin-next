@@ -1,6 +1,6 @@
-# Inshop CRM Admin
+# API Config Admin
 
-Next.js admin panel for Inshop CRM.
+Next.js admin panel for API Config.
 
 ## Prerequisites
 

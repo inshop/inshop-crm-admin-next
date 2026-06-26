@@ -1,13 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import CircularProgress from "@mui/material/CircularProgress";
 import { BooleanChip } from "@/components/BooleanChip";
+import { extractItems } from "@/lib/extract-items";
 
 interface ModuleWithRoles {
   id: number;
@@ -34,15 +36,14 @@ export default function RoleCheckboxesField({
 }: RoleCheckboxesFieldProps) {
   const [modules, setModules] = useState<ModuleWithRoles[]>([]);
   const [loading, setLoading] = useState(false);
-  const hasFetchedRef = useRef(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!enabled || hasFetchedRef.current) {
-      return;
-    }
+    if (!enabled) return;
 
     let cancelled = false;
     setLoading(true);
+    setError(null);
 
     fetch(modulesUrl, { credentials: "include" })
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
@@ -67,11 +68,13 @@ export default function RoleCheckboxesField({
 
         if (!cancelled) {
           setModules(withRoles);
-          hasFetchedRef.current = true;
         }
       })
       .catch(() => {
-        if (!cancelled) setModules([]);
+        if (!cancelled) {
+          setModules([]);
+          setError("Failed to load roles");
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -108,6 +111,12 @@ export default function RoleCheckboxesField({
         {label}
       </Typography>
 
+      {error && (
+        <Alert severity="error" sx={{ mb: 1 }}>
+          {error}
+        </Alert>
+      )}
+
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
           <CircularProgress size={24} />
@@ -115,8 +124,6 @@ export default function RoleCheckboxesField({
       ) : (
         <Box
           sx={{
-            maxHeight: 480,
-            overflowY: "auto",
             border: 1,
             borderColor: "divider",
             borderRadius: 1,
@@ -136,14 +143,13 @@ export default function RoleCheckboxesField({
           >
             {modules.map((mod) => {
               const moduleRoleIds = mod.roles.map((role) => role.id);
-              const selectedInModule = moduleRoleIds.filter((id) =>
+              const selectedCount = moduleRoleIds.filter((id) =>
                 selectedIds.includes(id),
-              );
+              ).length;
               const allSelected =
                 moduleRoleIds.length > 0 &&
-                selectedInModule.length === moduleRoleIds.length;
-              const someSelected =
-                selectedInModule.length > 0 && !allSelected;
+                selectedCount === moduleRoleIds.length;
+              const someSelected = selectedCount > 0 && !allSelected;
 
               return (
                 <Box
@@ -156,86 +162,29 @@ export default function RoleCheckboxesField({
                     bgcolor: "background.default",
                   }}
                 >
-                  {readOnly ? (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{
-                        display: "block",
-                        fontWeight: 600,
-                        textTransform: "capitalize",
-                        mb: 0.75,
-                      }}
-                    >
-                      {mod.name}
-                    </Typography>
-                  ) : (
-                    <FormControlLabel
-                      sx={{ display: "flex", ml: 0, mr: 0, mb: 0.75 }}
-                      control={
-                        <Checkbox
-                          size="small"
-                          checked={allSelected}
-                          indeterminate={someSelected}
-                          disabled={mod.roles.length === 0}
-                          onChange={(e) =>
-                            handleModuleToggle(moduleRoleIds, e.target.checked)
-                          }
-                        />
-                      }
-                      label={
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ fontWeight: 600, textTransform: "capitalize" }}
-                        >
-                          {mod.name}
-                        </Typography>
-                      }
-                    />
-                  )}
+                  <ModuleHeader
+                    name={mod.name}
+                    readOnly={readOnly}
+                    allSelected={allSelected}
+                    someSelected={someSelected}
+                    disabled={mod.roles.length === 0}
+                    onToggle={(checked) =>
+                      handleModuleToggle(moduleRoleIds, checked)
+                    }
+                  />
 
                   {mod.roles.length === 0 ? (
                     <Typography variant="body2" color="text.disabled">
                       No roles
                     </Typography>
-                  ) : readOnly ? (
-                    mod.roles.map((role) => (
-                      <Box
-                        key={role.id}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: 1,
-                          py: 0.25,
-                        }}
-                      >
-                        <Typography variant="body2" noWrap>
-                          {formatRoleLabel(role.name)}
-                        </Typography>
-                        <BooleanChip value={selectedIds.includes(role.id)} />
-                      </Box>
-                    ))
                   ) : (
                     mod.roles.map((role) => (
-                      <FormControlLabel
+                      <RoleRow
                         key={role.id}
-                        sx={{ display: "flex", ml: 0, mr: 0 }}
-                        control={
-                          <Checkbox
-                            size="small"
-                            checked={selectedIds.includes(role.id)}
-                            onChange={(e) =>
-                              handleToggle(role.id, e.target.checked)
-                            }
-                          />
-                        }
-                        label={
-                          <Typography variant="body2" noWrap>
-                            {formatRoleLabel(role.name)}
-                          </Typography>
-                        }
+                        name={role.name}
+                        checked={selectedIds.includes(role.id)}
+                        readOnly={readOnly}
+                        onToggle={(checked) => handleToggle(role.id, checked)}
                       />
                     ))
                   )}
@@ -249,13 +198,124 @@ export default function RoleCheckboxesField({
   );
 }
 
+function ModuleHeader({
+  name,
+  readOnly,
+  allSelected,
+  someSelected,
+  disabled,
+  onToggle,
+}: {
+  name: string;
+  readOnly: boolean;
+  allSelected: boolean;
+  someSelected: boolean;
+  disabled: boolean;
+  onToggle: (checked: boolean) => void;
+}) {
+  const displayName = formatModuleName(name);
+
+  if (readOnly) {
+    return (
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{
+          display: "block",
+          fontWeight: 600,
+          textTransform: "capitalize",
+          mb: 0.75,
+        }}
+      >
+        {displayName}
+      </Typography>
+    );
+  }
+
+  return (
+    <FormControlLabel
+      sx={{ display: "flex", ml: 0, mr: 0, mb: 0.75 }}
+      control={
+        <Checkbox
+          size="small"
+          checked={allSelected}
+          indeterminate={someSelected}
+          disabled={disabled}
+          onChange={(e) => onToggle(e.target.checked)}
+        />
+      }
+      label={
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ fontWeight: 600, textTransform: "capitalize" }}
+        >
+          {displayName}
+        </Typography>
+      }
+    />
+  );
+}
+
+function RoleRow({
+  name,
+  checked,
+  readOnly,
+  onToggle,
+}: {
+  name: string;
+  checked: boolean;
+  readOnly: boolean;
+  onToggle: (checked: boolean) => void;
+}) {
+  const displayName = formatRoleLabel(name);
+
+  if (readOnly) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1,
+          py: 0.25,
+        }}
+      >
+        <Typography variant="body2" noWrap>
+          {displayName}
+        </Typography>
+        <BooleanChip value={checked} />
+      </Box>
+    );
+  }
+
+  return (
+    <FormControlLabel
+      sx={{ display: "flex", ml: 0, mr: 0 }}
+      control={
+        <Checkbox
+          size="small"
+          checked={checked}
+          onChange={(e) => onToggle(e.target.checked)}
+        />
+      }
+      label={
+        <Typography variant="body2" noWrap>
+          {displayName}
+        </Typography>
+      }
+    />
+  );
+}
+
 function getSelectedIds(value: { id: number }[] | undefined): number[] {
   return value?.map((item) => item.id) ?? [];
 }
 
-function extractItems(data: unknown): { id: number; name: string }[] {
-  if (!data || !Array.isArray(data)) return [];
-  return Array.isArray(data[0]) ? data[0] : data;
+function formatModuleName(name: string): string {
+  return name
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function formatRoleLabel(name: string): string {

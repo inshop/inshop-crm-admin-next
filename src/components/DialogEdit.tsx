@@ -5,12 +5,41 @@ import { useEffect, useState } from "react";
 import { capitalize } from "@mui/material";
 import pluralize from "pluralize";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import CustomDialog from "@/components/CustomDialog";
 import FormField, { FieldConfig } from "@/components/FormField";
+
+function getEditFieldInitialValue(
+  data: Record<string, unknown>,
+  field: FieldConfig,
+): unknown {
+  const direct = data[field.name];
+  if (direct !== undefined && direct !== null && direct !== "") {
+    return field.type === "boolean" ? !!direct : direct;
+  }
+
+  if (field.name.endsWith("Id")) {
+    const relationKey = field.name.slice(0, -2);
+    const relation = data[relationKey];
+    if (relation && typeof relation === "object" && "id" in relation) {
+      return (relation as { id: number }).id;
+    }
+  }
+
+  if (field.type === "boolean") {
+    return false;
+  }
+
+  return "";
+}
+
+function getEntityLabel(entity: string): string {
+  if (entity === "featureFlag") return "Feature Flag";
+  if (entity === "apiToken") return "API Token";
+  return capitalize(entity);
+}
 
 interface DialogEditProps {
   entity: string;
@@ -46,10 +75,8 @@ export default function DialogEdit({
       open={open}
       handleClose={handleClose}
       maxWidth={dialogMaxWidth}
+      title={`Edit ${getEntityLabel(entity)}`}
     >
-      <Typography variant="h6" sx={{ mb: 2, pr: 4 }}>
-        Edit {capitalize(entity)}
-      </Typography>
 
       {api && (
         <EditForm
@@ -107,13 +134,12 @@ function EditForm({
 
   useEffect(() => {
     if (data && !initialized) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const initial: Record<string, any> = {};
+      const initial: Record<string, unknown> = {};
       for (const field of fields) {
-        initial[field.name] =
-          field.type === "boolean"
-            ? (data[field.name] ?? false)
-            : (data[field.name] ?? "");
+        initial[field.name] = getEditFieldInitialValue(
+          data as Record<string, unknown>,
+          field,
+        );
       }
       setFormData(initial);
       setInitialized(true);

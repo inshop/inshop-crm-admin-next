@@ -17,70 +17,118 @@ function isFieldDiff(value: unknown): value is FieldDiff {
   return (
     typeof value === "object" &&
     value !== null &&
-    "old" in value &&
-    "new" in value
+    !Array.isArray(value) &&
+    ("old" in value || "new" in value)
   );
+}
+
+function environmentLabel(environment: unknown): string {
+  if (typeof environment !== "object" || environment === null) {
+    return String(environment ?? "?");
+  }
+  if ("name" in environment && typeof environment.name === "string") {
+    return environment.name;
+  }
+  if ("code" in environment && typeof environment.code === "string") {
+    return environment.code;
+  }
+  if ("id" in environment) return String(environment.id);
+  return "?";
+}
+
+function formatEnvironmentValue(item: unknown): string {
+  if (typeof item !== "object" || item === null) return String(item ?? "?");
+  if ("enabled" in item) {
+    const enabled = (item as { enabled: boolean }).enabled;
+    const environment =
+      "environment" in item
+        ? (item as { environment: unknown }).environment
+        : undefined;
+    return `${environmentLabel(environment)}: ${enabled ? "enabled" : "disabled"}`;
+  }
+  return formatScalar(item);
 }
 
 function formatScalar(value: unknown): string {
   if (value === null || value === undefined) return "-";
   if (typeof value === "boolean") return value ? "Yes" : "No";
   if (typeof value === "object") {
+    if ("enabled" in value && "environment" in value) {
+      return formatEnvironmentValue(value);
+    }
     if ("name" in value && typeof value.name === "string") return value.name;
     if ("id" in value) return String(value.id);
   }
   return String(value);
 }
 
-function formatListItem(item: string): string {
-  return item.replace(/^ROLE_/, "").replace(/_/g, " ");
+function formatListItem(item: unknown): string {
+  if (typeof item === "string") {
+    return item.replace(/^ROLE_/, "").replace(/_/g, " ");
+  }
+  return formatEnvironmentValue(item);
 }
 
 function resolveCells(value: unknown, action?: string) {
   if (isFieldDiff(value)) {
-    return { before: value.old, after: value.new };
+    return {
+      before: "old" in value ? value.old : undefined,
+      after: "new" in value ? value.new : undefined,
+    };
   }
-  if (action === "delete") {
-    return { before: value, after: undefined };
-  }
+  if (action === "delete") return { before: value, after: undefined };
   return { before: undefined, after: value };
 }
 
 function EmptyDash() {
   return (
-    <Typography variant="body2" color="text.secondary">
-      -
+    <Typography variant="body2" color="text.disabled" sx={{ fontStyle: "italic" }}>
+      —
     </Typography>
   );
 }
 
 const diffColors = {
-  removedBg: "#ffebe9",
-  addedBg: "#dafbe1",
-  removedItemBg: "#ffcecb",
-  addedItemBg: "#aceebb",
+  removedBg: "#FEF2F2",
+  addedBg: "#F0FDF4",
+  removedItemBg: "#FECACA",
+  addedItemBg: "#BBF7D0",
+  removedText: "#991B1B",
+  addedText: "#166534",
 };
 
 const headerCellSx = {
-  fontWeight: "bold",
-  backgroundColor: "rgba(0, 0, 0, 0.04)",
+  fontWeight: 600,
+  fontSize: "0.6875rem",
+  letterSpacing: "0.06em",
+  textTransform: "uppercase" as const,
+  color: "#64748B",
+  backgroundColor: "#F8FAFC",
+  py: 1.5,
 };
 
 const beforeCellSx = {
   verticalAlign: "top",
   backgroundColor: diffColors.removedBg,
+  borderLeft: `2px solid #FECACA`,
+  py: 2,
 };
 
 const afterCellSx = {
   verticalAlign: "top",
   backgroundColor: diffColors.addedBg,
+  borderLeft: `2px solid #BBF7D0`,
+  py: 2,
 };
 
 const fieldCellSx = {
-  fontWeight: "bold",
+  fontWeight: 500,
+  fontSize: "0.8125rem",
   width: "140px",
-  backgroundColor: "rgba(0, 0, 0, 0.02)",
+  backgroundColor: "#F8FAFC",
   verticalAlign: "top",
+  color: "#475569",
+  py: 2,
 };
 
 function CellValue({
@@ -95,33 +143,43 @@ function CellValue({
   if (Array.isArray(value)) {
     if (value.length === 0) return <EmptyDash />;
 
-    const otherSet = new Set(
-      Array.isArray(compareWith) ? compareWith.map(String) : [],
-    );
-
     return (
-      <Box component="ul" sx={{ m: 0, pl: 0, listStyle: "none" }}>
-        {value.map(String).map((item) => {
-          const isRemoved = side === "before" && !otherSet.has(item);
-          const isAdded = side === "after" && !otherSet.has(item);
+      <Box component="ul" sx={{ m: 0, pl: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 0.5 }}>
+        {value.map((item, index) => {
+          const label = formatListItem(item);
+          const isRemoved =
+            side === "before" &&
+            Array.isArray(compareWith) &&
+            !compareWith.some((other) => formatListItem(other) === label);
+          const isAdded =
+            side === "after" &&
+            Array.isArray(compareWith) &&
+            !compareWith.some((other) => formatListItem(other) === label);
 
           return (
             <Box
               component="li"
-              key={item}
+              key={`${label}-${index}`}
               sx={{
                 typography: "body2",
                 px: 1,
                 py: 0.25,
-                borderRadius: 0.5,
+                borderRadius: "6px",
+                fontSize: "0.8125rem",
+                fontWeight: isRemoved || isAdded ? 500 : 400,
                 backgroundColor: isRemoved
                   ? diffColors.removedItemBg
                   : isAdded
                     ? diffColors.addedItemBg
                     : "transparent",
+                color: isRemoved
+                  ? diffColors.removedText
+                  : isAdded
+                    ? diffColors.addedText
+                    : "inherit",
               }}
             >
-              {formatListItem(item)}
+              {label}
             </Box>
           );
         })}
@@ -129,7 +187,11 @@ function CellValue({
     );
   }
 
-  return <Typography variant="body2">{formatScalar(value)}</Typography>;
+  return (
+    <Typography variant="body2" sx={{ fontSize: "0.8125rem" }}>
+      {formatScalar(value)}
+    </Typography>
+  );
 }
 
 function AuditTable({
@@ -140,7 +202,11 @@ function AuditTable({
   children: React.ReactNode;
 }) {
   return (
-    <TableContainer component={Paper} variant="outlined">
+    <TableContainer
+      component={Paper}
+      variant="outlined"
+      sx={{ borderRadius: "10px", overflow: "hidden" }}
+    >
       <Table size="small" sx={{ tableLayout: "fixed" }}>
         {headers && (
           <TableHead>
@@ -174,7 +240,6 @@ export function AuditChangesView({
   action?: string;
 }) {
   const entries = Object.entries(changes);
-
   if (entries.length === 0) return <EmptyDash />;
 
   return (
@@ -190,22 +255,14 @@ export function AuditChangesView({
               </TableCell>
               <TableCell sx={beforeCellSx}>
                 {before !== undefined ? (
-                  <CellValue
-                    value={before}
-                    compareWith={after}
-                    side="before"
-                  />
+                  <CellValue value={before} compareWith={after} side="before" />
                 ) : (
                   <EmptyDash />
                 )}
               </TableCell>
               <TableCell sx={afterCellSx}>
                 {after !== undefined ? (
-                  <CellValue
-                    value={after}
-                    compareWith={before}
-                    side="after"
-                  />
+                  <CellValue value={after} compareWith={before} side="after" />
                 ) : (
                   <EmptyDash />
                 )}
@@ -224,12 +281,11 @@ export function AuditMetadataView({
   metadata: Record<string, unknown>;
 }) {
   const labels: Record<string, string> = {
-    ip: "IP",
-    userAgent: "User agent",
+    ip: "IP Address",
+    userAgent: "User Agent",
   };
 
   const entries = Object.entries(metadata);
-
   if (entries.length === 0) return <EmptyDash />;
 
   return (
@@ -240,8 +296,10 @@ export function AuditMetadataView({
             <TableCell sx={fieldCellSx}>
               {labels[key] ?? capitalize(key.replace(/_/g, " "))}
             </TableCell>
-            <TableCell>
-              <Typography variant="body2">{formatScalar(value)}</Typography>
+            <TableCell sx={{ py: 2 }}>
+              <Typography variant="body2" sx={{ fontSize: "0.8125rem", color: "text.secondary" }}>
+                {formatScalar(value)}
+              </Typography>
             </TableCell>
           </TableRow>
         ))}

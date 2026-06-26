@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { capitalize } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -9,6 +9,9 @@ import Checkbox from "@mui/material/Checkbox";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
 import RoleCheckboxesField from "@/components/RoleCheckboxesField";
+import { extractItems } from "@/lib/extract-items";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs, { Dayjs } from "dayjs";
 
 export interface FieldConfig {
   name: string;
@@ -19,7 +22,8 @@ export interface FieldConfig {
     | "boolean"
     | "select"
     | "multiselect"
-    | "role-checkboxes";
+    | "role-checkboxes"
+    | "date";
   label?: string;
   options?: { id: number; label: string }[];
   optionsUrl?: string;
@@ -27,6 +31,8 @@ export interface FieldConfig {
   optionsPath?: string;
   optionLabelKey?: string;
   autoComplete?: string;
+  getDefaultValue?: () => unknown;
+  required?: boolean;
 }
 
 interface FormFieldProps {
@@ -37,6 +43,7 @@ interface FormFieldProps {
   onChange: (field: string, value: any) => void;
   /** When false, option loading is deferred (e.g. dialog closed). */
   enabled?: boolean;
+  error?: boolean;
 }
 
 export default function FormField({
@@ -44,6 +51,7 @@ export default function FormField({
   value,
   onChange,
   enabled = true,
+  error = false,
 }: FormFieldProps) {
   const label = config.label || capitalize(config.name.replace(/_/g, " "));
   const type = config.type || inferType(config.name);
@@ -55,12 +63,9 @@ export default function FormField({
     config.options || [],
   );
   const [loadingOptions, setLoadingOptions] = useState(false);
-  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    if (!shouldFetchOptions || !enabled || hasFetchedRef.current) {
-      return;
-    }
+    if (!shouldFetchOptions || !enabled) return;
 
     let cancelled = false;
     setLoadingOptions(true);
@@ -79,7 +84,6 @@ export default function FormField({
             label: item[labelKey] || String(item.id),
           })),
         );
-        hasFetchedRef.current = true;
       })
       .catch(() => {
         if (!cancelled) setOptions([]);
@@ -152,12 +156,16 @@ export default function FormField({
           renderInput={(params) => (
             <TextField
               label={label}
+              error={error}
               id={params.id}
               disabled={params.disabled}
               fullWidth={params.fullWidth}
               size={params.size}
               slotProps={{
-                inputLabel: params.slotProps.inputLabel,
+                inputLabel: {
+                  ...params.slotProps.inputLabel,
+                  required: config.required,
+                },
                 htmlInput: params.slotProps.htmlInput,
                 input: {
                   ...params.slotProps.input,
@@ -195,12 +203,16 @@ export default function FormField({
           renderInput={(params) => (
             <TextField
               label={label}
+              error={error}
               id={params.id}
               disabled={params.disabled}
               fullWidth={params.fullWidth}
               size={params.size}
               slotProps={{
-                inputLabel: params.slotProps.inputLabel,
+                inputLabel: {
+                  ...params.slotProps.inputLabel,
+                  required: config.required,
+                },
                 htmlInput: params.slotProps.htmlInput,
                 input: {
                   ...params.slotProps.input,
@@ -216,6 +228,35 @@ export default function FormField({
             />
           )}
           sx={{ mb: 2 }}
+        />
+      );
+
+    case "date":
+      return (
+        <DatePicker
+          label={label}
+          value={
+            value
+              ? dayjs(String(value).slice(0, 10))
+              : null
+          }
+          onChange={(newValue: Dayjs | null) =>
+            onChange(
+              config.name,
+              newValue?.isValid() ? newValue.format("YYYY-MM-DD") : null,
+            )
+          }
+          slotProps={{
+            field: { clearable: !config.required },
+            textField: {
+              fullWidth: true,
+              error,
+              sx: { mb: 2 },
+              slotProps: {
+                inputLabel: { required: config.required },
+              },
+            },
+          }}
         />
       );
 
@@ -238,6 +279,8 @@ export default function FormField({
           value={value || ""}
           onChange={(e) => onChange(config.name, e.target.value)}
           autoComplete={config.autoComplete}
+          required={config.required}
+          error={error}
           sx={{ mb: 2 }}
         />
       );
@@ -248,28 +291,31 @@ function inferType(name: string): FieldConfig["type"] {
   if (name === "password") return "password";
   if (name.startsWith("is") || name.startsWith("has")) return "boolean";
   if (name === "description" || name === "content" || name === "notes") return "textarea";
+  if (name === "expiresAt" || name.endsWith("At")) return "date";
   return "text";
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function extractItems(data: any, path?: string): any[] {
-  if (!path || path === "flat") {
-    return Array.isArray(data) ? (Array.isArray(data[0]) ? data[0] : data) : [];
-  }
+export function validateFormFields(
+  fields: FieldConfig[],
+  data: Record<string, unknown>,
+): string | null {
+  for (const field of fields) {
+    if (!field.required) continue;
 
-  const parts = path.split(".");
-  let items = Array.isArray(data) ? (Array.isArray(data[0]) ? data[0] : data) : [];
+    const label = field.label || field.name.replace(/_/g, " ");
+    const value = data[field.name];
 
-  for (const part of parts) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const nested: any[] = [];
-    for (const item of items) {
-      if (Array.isArray(item[part])) {
-        nested.push(...item[part]);
+    if (field.type === "multiselect") {
+      if (!Array.isArray(value) || value.length === 0) {
+        return `${label} is required`;
       }
+      continue;
     }
-    items = nested;
+
+    if (value === null || value === undefined || value === "") {
+      return `${label} is required`;
+    }
   }
 
-  return items;
+  return null;
 }

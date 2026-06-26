@@ -5,7 +5,9 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { Collapse } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import { Collapse, alpha } from "@mui/material";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { usePathname } from "next/navigation";
@@ -25,35 +27,55 @@ export default function NavMenuItem({ menuItem }: MenuItemProps) {
     setOpen(childActive);
   }, [childActive]);
 
-  const handleClick = () => {
-    setOpen((prev) => !prev);
-  };
+  if (menuItem.path) {
+    return <NavMenuItemPath menuItem={menuItem} />;
+  }
+
+  if (!menuItem.children || menuItem.children.length === 0) return null;
 
   return (
     <List disablePadding>
-      {menuItem.path && <NavMenuItemPath menuItem={menuItem}></NavMenuItemPath>}
+      <Box
+        sx={{
+          px: 2,
+          pt: 2,
+          pb: 0.5,
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <Box
+          sx={{
+            color: "#475569",
+            display: "flex",
+            "& svg": { fontSize: 14 },
+          }}
+        >
+          {menuItem.icon}
+        </Box>
+        <Typography
+          sx={{
+            fontSize: "0.6875rem",
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#475569",
+          }}
+        >
+          {menuItem.name}
+        </Typography>
+      </Box>
 
-      {menuItem.children && menuItem.children.length > 0 && (
-        <>
-          <ListItemButton onClick={handleClick}>
-            <ListItemIcon>{menuItem.icon}</ListItemIcon>
-            <ListItemText primary={menuItem.name} />
-            {open ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {menuItem.children.map((menuItem, index) => (
-                <NavMenuItemPath
-                  key={index}
-                  menuItem={menuItem}
-                  sx={{ pl: 4 }}
-                ></NavMenuItemPath>
-              ))}
-            </List>
-          </Collapse>
-        </>
-      )}
+      <List component="div" disablePadding>
+        {menuItem.children.map((child, index) => (
+          <NavMenuItemPath
+            key={index}
+            menuItem={child}
+            sx={{ pl: 2 }}
+          />
+        ))}
+      </List>
     </List>
   );
 }

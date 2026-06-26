@@ -5,10 +5,10 @@ import {
   columnsList,
   columnsDetails,
   formFields,
-} from "@/app/(dashboard)/clients/columns";
+} from "@/app/(dashboard)/projects/columns";
 
-const title = "Clients";
-const entity = "client";
+const title = "Projects";
+const entity = "project";
 
 export const metadata: Metadata = {
   title,

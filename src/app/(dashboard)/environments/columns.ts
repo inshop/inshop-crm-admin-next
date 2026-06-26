@@ -19,8 +19,8 @@ export const columnsList: GridColDef[] = [
     disableColumnMenu: true,
   },
   {
-    field: "email",
-    headerName: "email",
+    field: "code",
+    headerName: "Code",
     flex: 0.4,
     minWidth: 200,
     sortable: false,
@@ -37,11 +37,10 @@ export const columnsList: GridColDef[] = [
   },
 ];
 
-export const columnsDetails = ["id", "name", "email", "isActive"];
+export const columnsDetails = ["id", "name", "code", "isActive"];
 
 export const formFields: FieldConfig[] = [
   { name: "name" },
-  { name: "email", autoComplete: "off" },
-  { name: "password", type: "password" },
+  { name: "code" },
   { name: "isActive", type: "boolean" },
 ];

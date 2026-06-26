@@ -5,12 +5,19 @@ import { useEffect, useState } from "react";
 import { capitalize } from "@mui/material";
 import pluralize from "pluralize";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import CustomDialog from "@/components/CustomDialog";
-import FormField, { FieldConfig } from "@/components/FormField";
+import FormField, { FieldConfig, validateFormFields } from "@/components/FormField";
+import ApiTokenCurlSamples from "@/components/ApiTokenCurlSamples";
+
+interface ApiTokenCreatedInfo {
+  id: number;
+  plainToken: string;
+  projectCode: string;
+  environmentCode: string;
+}
 
 interface DialogCreateProps {
   entity: string;
@@ -38,16 +45,20 @@ export default function DialogCreate({
   }, [pluralEntity]);
 
   const dialogMaxWidth = entity === "group" ? "lg" : undefined;
+  const entityLabel =
+    entity === "featureFlag"
+      ? "Feature Flag"
+      : entity === "apiToken"
+        ? "API Token"
+        : capitalize(entity);
 
   return (
     <CustomDialog
       open={open}
       handleClose={handleClose}
       maxWidth={dialogMaxWidth}
+      title={`Create ${entityLabel}`}
     >
-      <Typography variant="h6" sx={{ mb: 2, pr: 4 }}>
-        Create {capitalize(entity)}
-      </Typography>
 
       {api && (
         <CreateForm
@@ -87,15 +98,25 @@ function CreateForm({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [error, setError] = useState<string | null>(null);
+  const [tokenCreated, setTokenCreated] = useState<ApiTokenCreatedInfo | null>(
+    null,
+  );
 
   const [trigger, { isLoading }] = api[mutationKey]();
 
   useEffect(() => {
     if (open) {
-      setFormData({});
+      const defaults: Record<string, unknown> = {};
+      for (const field of fields) {
+        if (field.getDefaultValue) {
+          defaults[field.name] = field.getDefaultValue();
+        }
+      }
+      setFormData(defaults);
       setError(null);
+      setTokenCreated(null);
     }
-  }, [open]);
+  }, [open, fields]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,7 +130,38 @@ function CreateForm({
           payload[field.name] = payload[field.name] === true;
         }
       }
-      await trigger({ [dtoKey]: payload }).unwrap();
+
+      const validationError = validateFormFields(fields, payload);
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+
+      const response = await trigger({ [dtoKey]: payload }).unwrap();
+
+      if (
+        response &&
+        typeof response === "object" &&
+        "plainToken" in response &&
+        typeof (response as { plainToken?: string }).plainToken === "string"
+      ) {
+        const created = response as {
+          id: number;
+          plainToken: string;
+          project?: { code?: string };
+          environment?: { code?: string };
+        };
+
+        setTokenCreated({
+          id: created.id,
+          plainToken: created.plainToken,
+          projectCode: created.project?.code ?? "PROJECT_CODE",
+          environmentCode: created.environment?.code ?? "ENVIRONMENT_CODE",
+        });
+        onSuccess?.();
+        return;
+      }
+
       onSuccess?.();
       handleClose();
     } catch (err: unknown) {
@@ -128,6 +180,28 @@ function CreateForm({
 
   return (
     <>
+      {tokenCreated && (
+        <>
+          <ApiTokenCurlSamples
+            plainToken={tokenCreated.plainToken}
+            projectCode={tokenCreated.projectCode}
+            environmentCode={tokenCreated.environmentCode}
+            showTokenWarning
+          />
+          <Button
+            variant="contained"
+            size="small"
+            sx={{ mb: 2 }}
+            onClick={() => {
+              setTokenCreated(null);
+              handleClose();
+            }}
+          >
+            Done
+          </Button>
+        </>
+      )}
+
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -137,8 +211,9 @@ function CreateForm({
       <Box
         component="form"
         onSubmit={handleSubmit}
+        noValidate
         autoComplete="off"
-        sx={{ width: "100%", mt: 2 }}
+        sx={{ width: "100%", mt: 2, display: tokenCreated ? "none" : "block" }}
       >
         {fields.map((field) => (
           <FormField

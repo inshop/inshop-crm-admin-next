@@ -2,6 +2,7 @@
 
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 import CustomDataGrid from "@/components/CustomDataGrid";
 import { GridColDef } from "@mui/x-data-grid";
 import { capitalize } from "@mui/material";
@@ -16,6 +17,8 @@ interface PageListType {
   columnsList: GridColDef[];
   columnsDetails: string[];
   formFields: FieldConfig[];
+  editFormFields?: FieldConfig[];
+  description?: string;
 }
 
 export default function PageList({
@@ -24,6 +27,8 @@ export default function PageList({
   columnsList,
   columnsDetails,
   formFields,
+  editFormFields,
+  description,
 }: PageListType) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [api, setApi] = useState<any>(null);
@@ -38,9 +43,17 @@ export default function PageList({
 
   return (
     <>
-      <Typography variant="h2">{title}</Typography>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h2" sx={{ mb: 0.5 }}>
+          {title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {description ?? `Manage and configure ${pluralize(title.toLowerCase())}`}
+        </Typography>
+        <Divider sx={{ mt: 2.5 }} />
+      </Box>
 
-      <Box sx={{ width: "100%", mt: 4 }}>
+      <Box sx={{ width: "100%" }}>
         {api && (
           <CustomDataGrid
             entity={entity}
@@ -48,6 +61,7 @@ export default function PageList({
             columnsList={columnsList}
             columnsDetails={columnsDetails}
             formFields={formFields}
+            editFormFields={editFormFields}
             canView={canDetails(entity)}
             canEdit={canUpdate(entity)}
             canDelete={canDelete(entity)}

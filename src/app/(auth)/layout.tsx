@@ -13,44 +13,41 @@ const Card = styled(MuiCard)(({ theme }) => ({
   gap: theme.spacing(2),
   margin: "auto",
   [theme.breakpoints.up("sm")]: {
-    maxWidth: "450px",
+    maxWidth: "420px",
   },
+  borderRadius: 10,
+  border: "1px solid #E2E8F0",
   boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
+    "0 4px 6px -1px rgba(0,0,0,0.05), 0 20px 60px -12px rgba(37,99,235,0.12), 0 0 0 1px rgba(0,0,0,0.03)",
 }));
 
-const AuthContainer = styled(Stack)(({ theme }) => ({
+const AuthContainer = styled(Stack)({
   height: "calc((1 - var(--template-frame-height, 0)) * 100dvh)",
   minHeight: "100%",
-  padding: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
-    padding: theme.spacing(4),
-  },
+  position: "relative",
   "&::before": {
     content: '""',
     display: "block",
-    position: "absolute",
+    position: "fixed",
     zIndex: -1,
     inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
+    backgroundImage: [
+      "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37,99,235,0.15) 0%, transparent 60%)",
+      "radial-gradient(ellipse 40% 40% at 80% 80%, rgba(124,58,237,0.08) 0%, transparent 60%)",
+      "linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%)",
+    ].join(", "),
     backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
   },
-}));
+});
 
 export default function AuthLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <AuthContainer direction="column" sx={{ justifyContent: "space-between" }}>
+    <AuthContainer
+      direction="column"
+      sx={{ justifyContent: "center", alignItems: "center", p: { xs: 2, sm: 4 } }}
+    >
       <Card variant="outlined">{children}</Card>
     </AuthContainer>
   );

@@ -7,11 +7,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ReactNode } from "react";
 import type { Breakpoint } from "@mui/material/styles";
 import type { SxProps, Theme } from "@mui/material/styles";
+import { Divider } from "@mui/material";
 
-interface DialogDetailsProps {
+interface CustomDialogProps {
   open: boolean;
   handleClose(): void;
   children: ReactNode;
+  title?: string;
   fullScreen?: boolean;
   maxWidth?: Breakpoint | false;
   contentSx?: SxProps<Theme>;
@@ -21,10 +23,11 @@ const CustomDialog = ({
   open,
   handleClose,
   children,
+  title,
   fullScreen = false,
   maxWidth = "md",
   contentSx,
-}: DialogDetailsProps) => {
+}: CustomDialogProps) => {
   return (
     <Dialog
       onClose={handleClose}
@@ -32,17 +35,54 @@ const CustomDialog = ({
       fullScreen={fullScreen}
       maxWidth={fullScreen ? false : maxWidth}
       fullWidth={!fullScreen}
+      scroll="body"
     >
-      <DialogTitle sx={{ m: 0, p: fullScreen ? undefined : 1 }}>
+      <DialogTitle
+        sx={{
+          m: 0,
+          p: fullScreen ? undefined : "12px 16px 12px 20px",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          minHeight: 52,
+        }}
+      >
+        <span
+          style={{
+            flex: 1,
+            fontSize: "1.0625rem",
+            fontWeight: 600,
+            color: "#0F172A",
+            letterSpacing: "-0.01em",
+            lineHeight: 1.3,
+          }}
+        >
+          {title ?? ""}
+        </span>
+
         <IconButton
           aria-label="close"
           onClick={handleClose}
-          sx={{ top: 8, right: 10, position: "absolute", color: "grey.500" }}
+          size="small"
+          sx={{
+            flexShrink: 0,
+            color: "text.disabled",
+            "&:hover": { color: "text.secondary", backgroundColor: "action.hover" },
+          }}
         >
-          <CloseIcon />
+          <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={fullScreen ? undefined : { pt: 1, ...contentSx }}>
+
+      <Divider />
+
+      <DialogContent
+        sx={
+          fullScreen
+            ? undefined
+            : { pt: 2.5, px: 2.5, pb: 3, overflowY: "visible", ...contentSx }
+        }
+      >
         {fullScreen ? (
           <Grid container spacing={6}>
             <Grid>{children}</Grid>

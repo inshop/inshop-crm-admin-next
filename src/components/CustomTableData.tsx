@@ -83,24 +83,25 @@ export default function CustomTableData({
         </Box>
       )}
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: "10px", overflow: "hidden" }}>
         <Table sx={{ width: "100%", tableLayout: "fixed" }}>
           <TableBody>
             {data &&
               columns.map((column) => (
                 <TableRow key={column}>
                   <TableCell
-                    component="th"
-                    scope="row"
                     sx={{
-                      fontWeight: "bold",
+                      fontWeight: 600,
+                      fontSize: "0.8125rem",
+                      color: "text.secondary",
                       width: "200px",
-                      backgroundColor: "rgba(0, 0, 0, 0.02)",
+                      backgroundColor: "#F8FAFC",
+                      py: 2,
                     }}
                   >
                     {capitalize(column.replace(/_/g, " "))}
                   </TableCell>
-                  <TableCell>{renderValue(column, data[column], data)}</TableCell>
+                  <TableCell sx={{ py: 2 }}>{renderValue(column, data[column], data)}</TableCell>
                 </TableRow>
               ))}
           </TableBody>

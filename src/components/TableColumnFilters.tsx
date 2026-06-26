@@ -5,11 +5,11 @@ import {
   Box,
   Button,
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
   TextField,
 } from "@mui/material";
+import FilterListOffIcon from "@mui/icons-material/FilterListOff";
 
 interface TableColumnFiltersProps {
   columns: GridColDef[];
@@ -25,44 +25,29 @@ export default function TableColumnFilters({
   const filterableColumns = columns.filter((col) => col.filterable !== false);
 
   const handleChange = (field: string, value: string) => {
-    onChange({
-      ...filters,
-      [field]: value,
-    });
+    onChange({ ...filters, [field]: value });
   };
 
-  const handleClear = () => {
-    onChange({});
-  };
+  const handleClear = () => onChange({});
 
   const hasActiveFilters = Object.values(filters).some((value) => value !== "");
 
-  if (filterableColumns.length === 0) {
-    return null;
-  }
+  if (filterableColumns.length === 0) return null;
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 2,
-        alignItems: "flex-end",
-      }}
-    >
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, alignItems: "flex-end" }}>
       {filterableColumns.map((col) => {
         const value = filters[col.field] ?? "";
 
         if (col.type === "boolean") {
           return (
-            <FormControl key={col.field} size="small" sx={{ minWidth: 140 }}>
-              <InputLabel>{col.headerName}</InputLabel>
+            <FormControl key={col.field} size="small" sx={{ minWidth: 130 }}>
               <Select
-                label={col.headerName}
                 value={value}
-                onChange={(event) =>
-                  handleChange(col.field, event.target.value)
-                }
+                displayEmpty
+                onChange={(event) => handleChange(col.field, event.target.value)}
+                renderValue={(v) => v === "" ? col.headerName : v === "true" ? "Yes" : "No"}
+                sx={{ color: value === "" ? "text.disabled" : "text.primary" }}
               >
                 <MenuItem value="">All</MenuItem>
                 <MenuItem value="true">Yes</MenuItem>
@@ -76,7 +61,7 @@ export default function TableColumnFilters({
           <TextField
             key={col.field}
             size="small"
-            label={col.headerName}
+            placeholder={col.headerName}
             value={value}
             onChange={(event) => handleChange(col.field, event.target.value)}
             sx={{ minWidth: 160 }}
@@ -85,8 +70,13 @@ export default function TableColumnFilters({
       })}
 
       {hasActiveFilters && (
-        <Button size="small" onClick={handleClear}>
-          Clear filters
+        <Button
+          size="small"
+          onClick={handleClear}
+          startIcon={<FilterListOffIcon fontSize="small" />}
+          sx={{ color: "text.secondary", fontWeight: 500 }}
+        >
+          Clear
         </Button>
       )}
     </Box>

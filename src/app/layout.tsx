@@ -26,8 +26,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Inshop CRM",
-  description: "Inshop CRM",
+  title: "API Config",
+  description: "API Config",
 };
 
 export default function RootLayout({

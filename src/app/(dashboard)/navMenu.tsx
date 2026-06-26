@@ -2,11 +2,14 @@
 
 import * as React from "react";
 import List from "@mui/material/List";
-import PeopleIcon from "@mui/icons-material/People";
 import SecurityIcon from "@mui/icons-material/Security";
 import GroupsIcon from "@mui/icons-material/Groups";
 import FaceIcon from "@mui/icons-material/Face";
 import HistoryIcon from "@mui/icons-material/History";
+import FolderIcon from "@mui/icons-material/Folder";
+import LayersIcon from "@mui/icons-material/Layers";
+import FlagIcon from "@mui/icons-material/Flag";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import NavMenuItem from "@/app/(dashboard)/navMenuItem";
 import { useAuth } from "@/providers/AuthProvider";
 
@@ -50,10 +53,22 @@ export function filterMenuItemsByPermission(
 
 const menuItems: MenuItemType[] = [
   {
-    name: "Clients",
-    path: "/clients",
-    entity: "client",
-    icon: <PeopleIcon />,
+    name: "Feature Flags",
+    path: "/feature-flags",
+    entity: "featureFlag",
+    icon: <FlagIcon />,
+  },
+  {
+    name: "Projects",
+    path: "/projects",
+    entity: "project",
+    icon: <FolderIcon />,
+  },
+  {
+    name: "Environments",
+    path: "/environments",
+    entity: "environment",
+    icon: <LayersIcon />,
   },
   {
     name: "Permissions",
@@ -70,6 +85,12 @@ const menuItems: MenuItemType[] = [
         path: "/permissions/groups",
         entity: "group",
         icon: <GroupsIcon />,
+      },
+      {
+        name: "API Tokens",
+        path: "/permissions/api-tokens",
+        entity: "apiToken",
+        icon: <VpnKeyIcon />,
       },
       {
         name: "Audit Log",

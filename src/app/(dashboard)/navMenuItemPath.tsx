@@ -5,10 +5,11 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { usePathname } from "next/navigation";
 import { isMenuPathActive, MenuItemType } from "@/app/(dashboard)/navMenu";
+import type { SxProps, Theme } from "@mui/material/styles";
 
 interface MenuItemProps {
   menuItem: MenuItemType;
-  sx?: object;
+  sx?: SxProps<Theme>;
 }
 
 export default function NavMenuItemPath({ menuItem, sx }: MenuItemProps) {

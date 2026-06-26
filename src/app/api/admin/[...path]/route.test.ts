@@ -33,12 +33,12 @@ describe("admin proxy route", () => {
     );
 
     const { GET } = await import("@/app/api/admin/[...path]/route");
-    const req = new NextRequest("http://localhost/api/admin/clients");
+    const req = new NextRequest("http://localhost/api/admin/projects");
 
     const res = await GET(req);
     expect(res.status).toBe(200);
     expect(fetch).toHaveBeenCalledWith(
-      "http://backend.test/api/admin/clients",
+      "http://backend.test/api/admin/projects",
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer access-token",
@@ -58,7 +58,7 @@ describe("admin proxy route", () => {
       .mockResolvedValueOnce(new Response(JSON.stringify([[], 0]), { status: 200 }));
 
     const { GET } = await import("@/app/api/admin/[...path]/route");
-    const req = new NextRequest("http://localhost/api/admin/clients");
+    const req = new NextRequest("http://localhost/api/admin/projects");
 
     const res = await GET(req);
     expect(res.status).toBe(200);
@@ -72,7 +72,7 @@ describe("admin proxy route", () => {
       .mockResolvedValueOnce(new Response("{}", { status: 401 }));
 
     const { GET } = await import("@/app/api/admin/[...path]/route");
-    const req = new NextRequest("http://localhost/api/admin/clients");
+    const req = new NextRequest("http://localhost/api/admin/projects");
 
     const res = await GET(req);
     expect(res.status).toBe(401);

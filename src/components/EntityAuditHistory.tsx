@@ -9,6 +9,7 @@ import {
   Alert,
   Box,
   capitalize,
+  Chip,
   CircularProgress,
   TablePagination,
   Typography,
@@ -34,15 +35,44 @@ interface EntityAuditHistoryProps {
 
 const pageSize = 25;
 
+const actionChipProps: Record<string, { color: string; bg: string; border: string }> = {
+  create: { color: "#166534", bg: "#F0FDF4", border: "#BBF7D0" },
+  update: { color: "#1D4ED8", bg: "#EFF6FF", border: "#BFDBFE" },
+  delete: { color: "#991B1B", bg: "#FEF2F2", border: "#FECACA" },
+};
+
+function ActionBadge({ action }: { action: string }) {
+  const normalized = action.toLowerCase();
+  const style = actionChipProps[normalized] ?? {
+    color: "#475569",
+    bg: "#F8FAFC",
+    border: "#E2E8F0",
+  };
+
+  return (
+    <Chip
+      label={capitalize(action)}
+      size="small"
+      sx={{
+        fontSize: "0.6875rem",
+        fontWeight: 600,
+        height: 20,
+        borderRadius: "4px",
+        color: style.color,
+        backgroundColor: style.bg,
+        border: `1px solid ${style.border}`,
+        "& .MuiChip-label": { px: 1 },
+      }}
+    />
+  );
+}
+
 export default function EntityAuditHistory({
   entityType,
   entityId,
 }: EntityAuditHistoryProps) {
   const [page, setPage] = useState(0);
-  const filter = JSON.stringify({
-    entityType,
-    entityId: String(entityId),
-  });
+  const filter = JSON.stringify({ entityType, entityId: String(entityId) });
 
   const { data, error, isLoading } = useAuditsControllerFindAllQuery({
     take: pageSize,
@@ -56,7 +86,7 @@ export default function EntityAuditHistory({
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-        <CircularProgress />
+        <CircularProgress size={28} />
       </Box>
     );
   }
@@ -72,17 +102,19 @@ export default function EntityAuditHistory({
 
   if (rows.length === 0) {
     return (
-      <Typography color="text.secondary" sx={{ py: 2 }}>
-        No history records
+      <Typography color="text.secondary" sx={{ py: 3, textAlign: "center" }}>
+        No history records found
       </Typography>
     );
   }
 
   return (
-    <Box>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
       {rows.map((entry) => (
-        <Accordion key={entry.id} disableGutters sx={{ mb: 1 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Accordion key={entry.id} disableGutters>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon sx={{ color: "text.secondary", fontSize: 18 }} />}
+          >
             <Box
               sx={{
                 display: "flex",
@@ -90,30 +122,54 @@ export default function EntityAuditHistory({
                 flexWrap: "wrap",
                 alignItems: "center",
                 width: "100%",
+                pr: 1,
               }}
             >
-              <Typography variant="body2" sx={{ minWidth: 160 }}>
+              <Typography
+                variant="caption"
+                sx={{ minWidth: 140, color: "text.secondary", fontFamily: "monospace" }}
+              >
                 {formatDateTimeEu(entry.createdAt)}
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                {capitalize(entry.action)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {entry.user?.name ?? "-"}
-              </Typography>
+
+              <ActionBadge action={entry.action} />
+
+              {entry.user?.name && (
+                <Typography
+                  variant="body2"
+                  sx={{ color: "text.secondary", fontSize: "0.8125rem" }}
+                >
+                  by{" "}
+                  <Box component="span" sx={{ fontWeight: 500, color: "text.primary" }}>
+                    {entry.user.name}
+                  </Box>
+                </Typography>
+              )}
             </Box>
           </AccordionSummary>
-          <AccordionDetails sx={{ pt: 0 }}>
+
+          <AccordionDetails sx={{ pt: 1.5, pb: 2, px: 2 }}>
             {entry.changes && Object.keys(entry.changes).length > 0 && (
               <Box sx={{ mb: entry.metadata ? 2 : 0 }}>
-                <AuditChangesView
-                  changes={entry.changes}
-                  action={entry.action}
-                />
+                <Typography
+                  variant="caption"
+                  sx={{ display: "block", mb: 1, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "text.secondary" }}
+                >
+                  Changes
+                </Typography>
+                <AuditChangesView changes={entry.changes} action={entry.action} />
               </Box>
             )}
             {entry.metadata && Object.keys(entry.metadata).length > 0 && (
-              <AuditMetadataView metadata={entry.metadata} />
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ display: "block", mb: 1, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "text.secondary" }}
+                >
+                  Metadata
+                </Typography>
+                <AuditMetadataView metadata={entry.metadata} />
+              </Box>
             )}
           </AccordionDetails>
         </Accordion>
@@ -127,6 +183,7 @@ export default function EntityAuditHistory({
           onPageChange={(_, newPage) => setPage(newPage)}
           rowsPerPage={pageSize}
           rowsPerPageOptions={[pageSize]}
+          sx={{ borderTop: "1px solid", borderColor: "divider", mt: 1 }}
         />
       )}
     </Box>

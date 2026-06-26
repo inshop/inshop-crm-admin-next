@@ -8,10 +8,10 @@ describe("middleware auth", () => {
   });
 
   it("redirects protected paths without token", () => {
-    expect(shouldRedirectToLogin("/clients", undefined)).toBe(true);
+    expect(shouldRedirectToLogin("/feature-flags", undefined)).toBe(true);
   });
 
   it("allows protected paths with token", () => {
-    expect(shouldRedirectToLogin("/clients", "token-value")).toBe(false);
+    expect(shouldRedirectToLogin("/feature-flags", "token-value")).toBe(false);
   });
 });

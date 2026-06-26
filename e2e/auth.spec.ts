@@ -1,11 +1,11 @@
 import { test, expect } from "@playwright/test";
 
-test("redirects unauthenticated users from /clients to /", async ({ page }) => {
-  await page.goto("/clients");
+test("redirects unauthenticated users from /feature-flags to /", async ({ page }) => {
+  await page.goto("/feature-flags");
   await expect(page).toHaveURL("/");
 });
 
-test("logs in and reaches clients page", async ({ page }) => {
+test("logs in and reaches feature flags page", async ({ page }) => {
   await page.route("**/api/admin/auth/login", async (route) => {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const payload = Buffer.from(
@@ -13,7 +13,7 @@ test("logs in and reaches clients page", async ({ page }) => {
         id: 1,
         name: "Admin",
         email: "admin@example.com",
-        roles: ["ROLE_CLIENT_LIST"],
+        roles: ["ROLE_FEATURE_FLAG_LIST"],
         exp,
       }),
     )
@@ -33,7 +33,7 @@ test("logs in and reaches clients page", async ({ page }) => {
           id: 1,
           name: "Admin",
           email: "admin@example.com",
-          roles: ["ROLE_CLIENT_LIST"],
+          roles: ["ROLE_FEATURE_FLAG_LIST"],
         },
         token,
         refreshToken: token,
@@ -44,7 +44,7 @@ test("logs in and reaches clients page", async ({ page }) => {
     });
   });
 
-  await page.route("**/api/admin/clients**", async (route) => {
+  await page.route("**/api/admin/feature-flags**", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -57,5 +57,5 @@ test("logs in and reaches clients page", async ({ page }) => {
   await page.getByLabel("Password").fill("password");
   await page.getByRole("button", { name: /sign in/i }).click();
 
-  await expect(page).toHaveURL("/clients");
+  await expect(page).toHaveURL("/feature-flags");
 });

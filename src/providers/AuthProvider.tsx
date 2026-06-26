@@ -11,6 +11,8 @@ interface AuthUser {
 
 interface AuthContextType {
   user: AuthUser | null;
+  login: (userData: AuthUser) => void;
+  logout: () => void;
   hasRole: (role: string) => boolean;
   canCreate: (entity: string) => boolean;
   canUpdate: (entity: string) => boolean;
@@ -21,6 +23,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  login: () => {},
+  logout: () => {},
   hasRole: () => false,
   canCreate: () => false,
   canUpdate: () => false,
@@ -47,10 +51,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(getStoredUser());
   }, []);
 
+  const login = (userData: AuthUser) => {
+    localStorage.setItem("auth_user", JSON.stringify(userData));
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("auth_user");
+    setUser(null);
+  };
+
   const hasRole = (role: string) => user?.roles?.includes(role) ?? false;
 
-  const entityRole = (entity: string, action: string) =>
-    `ROLE_${entity.toUpperCase()}_${action}`;
+  const entityRole = (entity: string, action: string) => {
+    const prefix =
+      entity === "featureFlag"
+        ? "FEATURE_FLAG"
+        : entity === "apiToken"
+          ? "API_TOKEN"
+          : entity.toUpperCase();
+    return `ROLE_${prefix}_${action}`;
+  };
 
   const canCreate = (entity: string) => hasRole(entityRole(entity, "CREATE"));
   const canUpdate = (entity: string) => hasRole(entityRole(entity, "UPDATE"));
@@ -60,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, hasRole, canCreate, canUpdate, canList, canDetails, canDelete }}
+      value={{ user, login, logout, hasRole, canCreate, canUpdate, canList, canDetails, canDelete }}
     >
       {children}
     </AuthContext.Provider>

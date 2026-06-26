@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
 import CustomDialog from "@/components/CustomDialog";
 
 type Props = {
@@ -58,10 +58,7 @@ export default function ChangePasswordDialog({ open, onClose }: Props) {
   };
 
   return (
-    <CustomDialog open={open} handleClose={close} maxWidth="xs">
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Change password
-      </Typography>
+    <CustomDialog open={open} handleClose={close} maxWidth="xs" title="Change password">
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -92,9 +89,9 @@ export default function ChangePasswordDialog({ open, onClose }: Props) {
           />
         </FormControl>
         {error && (
-          <Typography color="error" variant="body2">
+          <Alert severity="error" sx={{ py: 0.5 }}>
             {error}
-          </Typography>
+          </Alert>
         )}
         <Button type="submit" variant="contained" disabled={isSubmitting}>
           {isSubmitting ? "Saving…" : "Save"}

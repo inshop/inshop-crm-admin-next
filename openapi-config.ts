@@ -1,7 +1,7 @@
 import type { ConfigFile } from '@rtk-query/codegen-openapi'
 
 const config: ConfigFile = {
-  schemaFile: 'http://localhost:4000/api-json',
+  schemaFile: './openapi.json',
   apiFile: './src/lib/redux/api.ts',
   apiImport: 'api',
   exportName: 'api',
@@ -15,14 +15,20 @@ const config: ConfigFile = {
     './src/lib/redux/features/groups.ts': {
       filterEndpoints: [/groups/i],
     },
-    './src/lib/redux/features/clients.ts': {
-      filterEndpoints: [/clients/i],
+    './src/lib/redux/features/projects.ts': {
+      filterEndpoints: [/projects/i],
     },
-    './src/lib/redux/features/contacts.ts': {
-      filterEndpoints: [/contacts/i],
+    './src/lib/redux/features/environments.ts': {
+      filterEndpoints: [/environments/i],
+    },
+    './src/lib/redux/features/featureFlags.ts': {
+      filterEndpoints: [/featureFlags/i],
     },
     './src/lib/redux/features/audits.ts': {
       filterEndpoints: [/audits/i],
+    },
+    './src/lib/redux/features/apiTokens.ts': {
+      filterEndpoints: [/apiTokens/i],
     },
   },
   hooks: true,
