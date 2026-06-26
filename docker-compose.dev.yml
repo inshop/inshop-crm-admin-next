@@ -54,6 +54,7 @@ services:
     volumes:
       - .:/app
       - admin-node-modules:/app/node_modules
+      - admin-next-build:/app/.next
     ports:
       - "3000:3000"
     env_file:
@@ -61,7 +62,7 @@ services:
         required: false
     environment:
       BACKEND_BASE_URL: http://api:4000
-    command: sh -c "yarn install --frozen-lockfile && yarn dev -- -H 0.0.0.0"
+    command: sh -c "yarn install --frozen-lockfile && yarn next dev --webpack -H 0.0.0.0"
     depends_on:
       - api
 
@@ -69,3 +70,4 @@ volumes:
   db-data:
   api-node-modules:
   admin-node-modules:
+  admin-next-build:
