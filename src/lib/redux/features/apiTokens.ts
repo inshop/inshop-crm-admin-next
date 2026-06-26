@@ -64,6 +64,7 @@ const injectedRtkApi = api.injectEndpoints({
 export { injectedRtkApi as api };
 export type ApiTokensControllerCreateApiResponse = {
   plainToken?: string;
+  tokenPrefix?: string;
   id: number;
   name: string;
 };
@@ -78,6 +79,7 @@ export type ApiTokensControllerFindAllApiArg = {
 };
 export type ApiTokensControllerFindOneApiResponse = {
   plainToken?: string;
+  tokenPrefix?: string;
   id: number;
   name: string;
   project?: { code?: string };

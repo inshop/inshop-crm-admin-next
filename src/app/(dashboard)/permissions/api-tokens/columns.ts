@@ -29,6 +29,15 @@ export const columnsList: GridColDef[] = [
     renderCell: (params) => params.row.environment?.name ?? "-",
   },
   {
+    field: "tokenPrefix",
+    headerName: "Token",
+    flex: 0.2,
+    minWidth: 140,
+    sortable: false,
+    disableColumnMenu: true,
+    renderCell: (params) => params.value ?? "-",
+  },
+  {
     field: "isActive",
     headerName: "Active",
     type: "boolean",
@@ -53,6 +62,7 @@ export const columnsList: GridColDef[] = [
 export const columnsDetails = [
   "id",
   "name",
+  "tokenPrefix",
   "environment",
   "isActive",
   "createdAt",

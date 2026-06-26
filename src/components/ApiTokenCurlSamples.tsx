@@ -9,6 +9,7 @@ import { buildApiTokenCurlExamples } from "@/lib/api-token-curl-examples";
 interface ApiTokenCurlSamplesProps {
   environmentCode: string;
   plainToken?: string;
+  tokenPrefix?: string;
   showTokenWarning?: boolean;
   onRegenerate?: () => void | Promise<void>;
   isRegenerating?: boolean;
@@ -17,20 +18,22 @@ interface ApiTokenCurlSamplesProps {
 export default function ApiTokenCurlSamples({
   environmentCode,
   plainToken,
+  tokenPrefix,
   showTokenWarning = false,
   onRegenerate,
   isRegenerating = false,
 }: ApiTokenCurlSamplesProps) {
   const hasRealToken = !!plainToken;
-  const curlExamples = hasRealToken
-    ? buildApiTokenCurlExamples(plainToken, environmentCode)
-    : null;
+  const curlExamples = buildApiTokenCurlExamples(
+    plainToken ?? "<YOUR_TOKEN>",
+    environmentCode,
+  );
 
   return (
     <Alert severity={showTokenWarning ? "warning" : "info"} sx={{ mb: 2 }}>
       {showTokenWarning ? (
         <>
-          Copy this token now. You can also view it later in token details.
+          Copy this token now. You will not be able to view it again.
           <Box
             component="code"
             sx={{
@@ -87,9 +90,15 @@ export default function ApiTokenCurlSamples({
         </>
       ) : (
         <>
+          {tokenPrefix && (
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              Token prefix:{" "}
+              <Box component="code">{tokenPrefix}</Box>
+            </Typography>
+          )}
           <Typography variant="body2" sx={{ mb: 1 }}>
-            Token secret is not stored for this record. Regenerate to get a new
-            token and curl examples.
+            The full token secret is not stored. Regenerate to get a new token
+            and curl examples.
           </Typography>
           {onRegenerate && (
             <Button
@@ -106,13 +115,14 @@ export default function ApiTokenCurlSamples({
         </>
       )}
 
-      {curlExamples && (
+      {(hasRealToken || !showTokenWarning) && (
         <>
           <Typography
             variant="subtitle2"
-            sx={{ mt: showTokenWarning || hasRealToken ? 2 : 0, mb: 0.5 }}
+            sx={{ mt: showTokenWarning || hasRealToken ? 2 : 1, mb: 0.5 }}
           >
             Example usage
+            {!hasRealToken && !showTokenWarning ? " (replace <YOUR_TOKEN>)" : ""}
           </Typography>
           <Box
             component="pre"

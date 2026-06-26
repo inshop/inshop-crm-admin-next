@@ -23,10 +23,11 @@ export default function ApiTokenDetailsCurlSamples({
 
   const token = data as {
     plainToken?: string;
+    tokenPrefix?: string;
     environment?: { code?: string };
   };
 
-  const plainToken = token.plainToken ?? regeneratedToken;
+  const plainToken = regeneratedToken;
 
   const handleRegenerate = async () => {
     const result = await regenerate({ id: tokenId }).unwrap();
@@ -43,6 +44,7 @@ export default function ApiTokenDetailsCurlSamples({
   return (
     <ApiTokenCurlSamples
       plainToken={plainToken}
+      tokenPrefix={token.tokenPrefix}
       environmentCode={token.environment?.code ?? "ENVIRONMENT_CODE"}
       onRegenerate={plainToken ? undefined : handleRegenerate}
       isRegenerating={isRegenerating}
